@@ -1,5 +1,8 @@
+
+
 import { Global, Module } from "@nestjs/common";
+
 
 @Global()
 @Module({})
-export class AuthModule { }
+export class UserModule { }
