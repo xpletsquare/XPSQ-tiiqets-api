@@ -6,6 +6,7 @@ import { ENV_KEYS } from './keys';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('v1/api');
   await app.listen(ENV_KEYS.PORT);
   console.log(`APPLICATION STARTED ON PORT ${ENV_KEYS.PORT}`)
 }
