@@ -1,10 +1,5 @@
 import { Optional } from '@nestjs/common';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class EventDTO {
   @IsOptional()
@@ -34,7 +29,11 @@ export class EventDTO {
 
   @IsArray()
   @IsNotEmpty({ message: 'event tickets type must be providedy' })
-  tickets: { name: string; description: string; price: number };
+  tickets: {
+    name: string;
+    description: string;
+    price: number;
+  }[];
 
   user_id?: string;
 }

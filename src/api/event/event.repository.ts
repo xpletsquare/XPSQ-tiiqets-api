@@ -19,7 +19,7 @@ export class EventRepository {
       date: dto.date,
       description: dto.description,
       image: dto.image,
-      tickets: dto.tickets,
+      tickets: dto.tickets.map((ticket) => ({ id: generateId(), ...ticket })),
     };
 
     const event = await this.eventModel.create(eventData);

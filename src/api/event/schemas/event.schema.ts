@@ -23,7 +23,7 @@ export class Event extends Document {
   image: string;
 
   @Prop()
-  tickets: { name: string; price: number; description: string }[];
+  tickets: { id: string; name: string; price: number; description: string }[];
 
   @Prop()
   user_id: string;
