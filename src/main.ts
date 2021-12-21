@@ -9,7 +9,6 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Tickets API For XPSQ')
-    .setDescription('Sample description')
     .setVersion('1.0')
     .build();
 
