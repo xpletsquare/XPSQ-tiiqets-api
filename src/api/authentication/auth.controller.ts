@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SuccessResponse } from 'src/utilities/successMessage';
 import { CreateTempUserDTO } from '../user/dtos/createTempUser.dto';
 import { AuthService } from './auth.service';
@@ -7,6 +8,7 @@ import { CompletePasswordReset } from './dtos/completePasswordReset.dto';
 import { LoginUserDTO } from './dtos/loginUser.dto';
 import { ValidatePasswordResetPin } from './dtos/validateResetPin.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

@@ -1,9 +1,11 @@
 import { CacheTTL, Controller, Get, Param, Post } from "@nestjs/common";
+import { ApiOkResponse, ApiProduces, ApiTags } from "@nestjs/swagger";
 import { SuccessResponse } from "src/utilities/successMessage";
+import { SingleUserResponse, UserListResponse } from "./responses";
 import { UserService } from "./user.service";
 
 
-
+@ApiTags('User')
 @Controller('users')
 export class UserController {
 
@@ -17,6 +19,10 @@ export class UserController {
     userFound: 'user data retrieved'
   }
 
+  @ApiOkResponse({
+    description: 'Users Retrieved',
+    type: UserListResponse
+  })
   @CacheTTL(30) // Save response in cache for 30 seconds
   @Get()
   async getUsers() {
@@ -24,6 +30,10 @@ export class UserController {
     return new SuccessResponse(this.responses.success, users);
   }
 
+  @ApiOkResponse({
+    description: 'User Retrieved',
+    type: SingleUserResponse,
+  })
   @Get(':id')
   async getUserInfo(@Param('id') id: string) {
     const userInfo = await this.userService.getSingleUser(id);
