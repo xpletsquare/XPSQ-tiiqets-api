@@ -1,6 +1,5 @@
-import { Body, CacheTTL, Controller, Get, Param, Post } from "@nestjs/common";
+import { CacheTTL, Controller, Get, Param, Post } from "@nestjs/common";
 import { SuccessResponse } from "src/utilities/successMessage";
-import { CreateTempUserDTO } from "./dtos/createTempUser.dto";
 import { UserService } from "./user.service";
 
 
@@ -23,12 +22,6 @@ export class UserController {
   async getUsers() {
     const users = await this.userService.getUsers();
     return new SuccessResponse(this.responses.success, users);
-  }
-
-  @Post('register')
-  async registerUser(@Body() body: CreateTempUserDTO) {
-    const data = await this.userService.createTempUser(body);
-    return new SuccessResponse(this.responses.registrationSuccess, data);
   }
 
   @Get(':id')

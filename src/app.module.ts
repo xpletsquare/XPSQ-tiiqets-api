@@ -8,7 +8,8 @@ import { ENV_KEYS } from './keys';
   imports: [
     MongooseModule.forRoot(ENV_KEYS.MONGO_URL),
     EventEmitterModule.forRoot({
-      maxListeners: 10
+      maxListeners: 10,
+      global: true
     }),
     CacheModule.register({
       ttl: 30,

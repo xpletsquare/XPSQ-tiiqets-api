@@ -16,6 +16,7 @@ export class UserEventListeners {
 
   @OnEvent(APP_EVENTS.UserCreated)
   async onUserSignup(payload: UserWithActivationPin) {
+    console.log('use signup event called');
     // save user to cache
     const TWENTY_FOUR_HOURS = 60 * 60 * 24;
     await this.cacheService.set(payload.user.email, payload, TWENTY_FOUR_HOURS);

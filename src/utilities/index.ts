@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import { ENV_KEYS } from "src/keys";
 
+const qrcodeReader = require('qrcode');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const fs = require('graceful-fs');
@@ -73,6 +75,32 @@ export const normalizeRating = (value: string | number) => {
 }
 
 export const generatePin = (numLength = 6) => {
+  if (ENV_KEYS.NODE_ENV === 'development') {
+    return 123456;
+  }
+
   const randomFloat = Math.random() * (10 ^ numLength);
   return Math.round(randomFloat);
+}
+
+export const getQRCode = async (value: unknown): Promise<string> => {
+  return new Promise((resolve) => {
+    const valueAsString = JSON.stringify(value);
+
+    qrcodeReader.toDataURL(valueAsString, (err: any, url: string) => {
+      if (err) {
+        console.log('QRCODE ERROR: ', err.message || err)
+      }
+
+      resolve(url || null)
+    })
+  })
+}
+
+export const getUserCartKey = (userId: string) => `CART-${userId}`;
+
+export const getCartTicketKey = (eventId: string, ticketType: string) => ticketType + '-' + eventId;
+
+export const envIsProd = () => {
+  return process.env.NODE_ENV === 'production';
 }
