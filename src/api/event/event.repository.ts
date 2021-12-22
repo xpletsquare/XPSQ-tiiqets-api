@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Event, EventDocument } from './schemas/event.schema';
-import { EventDTO } from './dtos/event.dto';
+import { CreateEventDTO } from './dtos/create-event.dto';
 import { generateId } from 'src/utilities';
 
 
@@ -13,15 +13,22 @@ export class EventRepository {
   ) {}
 
 
-  async createEvent(dto: EventDTO) {
-    const eventData: EventDTO & { id: string } = {
+  async createEvent(dto: CreateEventDTO) {
+    const eventData: CreateEventDTO & { id: string } = {
       id: generateId(),
       title: dto.title,
       venue: dto.venue,
       date: dto.date,
       description: dto.description,
+      startsAt: dto.startsAt,
+      endsAt: dto.endsAt,
       image: dto.image,
-      tickets: dto.tickets.map((ticket) => ({ id: generateId(), ...ticket })),
+      category: dto.category
+      // TODO: Implement Location Tracking
+      // location: {
+      //   longitude: dto.longitude,
+      //   latitude: dto.latitude,
+      // }
     };
 
     const event = await this.eventModel.create(eventData);

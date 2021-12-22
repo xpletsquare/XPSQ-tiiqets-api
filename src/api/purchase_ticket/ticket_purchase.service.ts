@@ -6,7 +6,7 @@ import { AxiosResponse } from 'axios';
 
 import { TicketPurchaseDocument } from './schemas/ticket_purchase.schema';
 import { TicketPurchase } from './schemas/ticket_purchase.schema';
-import { ENV_KEYS as CONFIG } from 'src/keys';
+import { CONFIG as CONFIG } from 'src/config';
 
 @Injectable()
 export class TicketPurchaseService {

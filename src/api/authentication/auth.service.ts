@@ -26,6 +26,12 @@ export class AuthService {
   private readonly cloudinaryHelper = new CloudinaryHelper;
 
   async registerUser(details: CreateTempUserDTO) {
+    const userInCache = await this.cacheService.get(details.email) as UserWithActivationPin;
+
+    if (userInCache && userInCache?.user?.email) {
+      throw new BadRequestException('User exists with the above email');
+    }
+
     const data = await this.userService.createTempUser(details);
     return data;
   }
@@ -52,6 +58,8 @@ export class AuthService {
     if (!validCredentials) {
       throw new BadRequestException('Incorrect Email/Password');
     }
+
+    this.eventEmitterClient.emit(APP_EVENTS.UserLogin, user.toDto());
 
     return createJWTWithPayload(user.toDto());
   }

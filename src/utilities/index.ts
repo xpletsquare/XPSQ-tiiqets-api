@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { ENV_KEYS } from "src/keys";
+import { CONFIG } from "src/config";
 
 const qrcodeReader = require('qrcode');
 const jwt = require('jsonwebtoken');
@@ -75,7 +75,7 @@ export const normalizeRating = (value: string | number) => {
 }
 
 export const generatePin = (numLength = 6) => {
-  if (ENV_KEYS.NODE_ENV === 'development') {
+  if (CONFIG.NODE_ENV === 'development') {
     return 123456;
   }
 

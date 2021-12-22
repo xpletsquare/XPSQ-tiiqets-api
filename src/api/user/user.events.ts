@@ -22,19 +22,19 @@ export class UserEventListeners {
     await this.cacheService.set(payload.user.email, payload, TWENTY_FOUR_HOURS);
 
     // send activation email
-    await this.emailService.sendActivationOTP(payload.user.firstName, payload.user.email, payload.activationPin)
+    await this.emailService.sendActivationOTP(payload.user as UserDTO, payload.activationPin)
   }
 
   @OnEvent(APP_EVENTS.UserActivated)
   async onUserActivated(payload: CreateUserDTO) {
     await this.cacheService.del(payload.email);
     await this.emailService.sendActivationSuccess(payload.firstName, payload.email);
-    await this.emailService.sendWelcome(payload.firstName, payload.email);
+    await this.emailService.sendWelcomeEmail(payload);
   }
 
   @OnEvent(APP_EVENTS.UserLogin)
   async onUserLogin(payload: UserDTO) {
-    await this.emailService.sendLoginAlert(payload.firstName, payload.email);
+    await this.emailService.sendLoginAlert(payload);
   }
 
   @OnEvent(APP_EVENTS.PasswordResetRequested)

@@ -11,7 +11,7 @@ import { Event, EventSchema } from './schemas/event.schema';
       {
         name: Event.name,
         schema: EventSchema,
-      },
+      }
     ]),
   ],
   controllers: [EventController],

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,56 +10,53 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { throwHttpError } from 'src/utilities/errorMessage';
 import { SuccessResponse } from 'src/utilities/successMessage';
-import { EventDTO } from './dtos/event.dto';
+import { CreateEventTicketDTO } from './dtos/create-event-ticket.dto';
+import { CreateEventDTO } from './dtos/create-event.dto';
 import { EventRepository } from './event.repository';
+import { EventService } from './event.service';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventController {
-  constructor(private repository: EventRepository) {}
+  constructor(
+    private repository: EventRepository,
+    private eventService: EventService
+  ) { }
 
   @Post()
-  async create(@Body() body: EventDTO) {
-    const event = await this.repository.createEvent(body);
-
+  async create(@Body() body: CreateEventDTO) {
+    const event = await this.eventService.createEvent(body);
     return new SuccessResponse('Event created successfully', event);
+  }
+
+  @Post('tickets')
+  async addTicket(@Body() body: CreateEventTicketDTO) {
+    await this.eventService.addEventTicket(body);
+    return new SuccessResponse('Event Ticket Created');
   }
 
   @Get('/:id')
   async get(@Param('id') id: string) {
     const event = await this.repository.findOne(id);
-
-    return new SuccessResponse('success', event);
+    return new SuccessResponse('success', event.toDto());
   }
 
   @Put('/:id')
-  async update(@Param('id') id: string, @Body() body: Partial<EventDTO>) {
-    const event = await this.repository.findOne(id);
-    if (!event) throw throwHttpError(400, 'Event not found');
-
-    const isUpdated = await this.repository.updateEvent(id, body);
-    if (!isUpdated) throw throwHttpError(400, 'Unable to update event');
-
+  async update(@Param('id') id: string, @Body() body: Partial<CreateEventDTO>) {
+    await this.eventService.updateEvent(id, body);
     return new SuccessResponse('success', 'Event updated successfully');
   }
 
   @Delete('/:id')
   async deleteEvent(@Param('id') id: string) {
-    const event = await this.repository.findOne(id);
-    if (!event) throw throwHttpError(400, 'Event not found');
-
-    const isDeleted = await this.repository.updateEvent(id);
-    if (!isDeleted) throw throwHttpError(400, 'Unable to delete event');
-
-    return new SuccessResponse('success', 'Event updated successfully');
+    await this.eventService.deleteEvent(id);
+    return new SuccessResponse('Event updated successfully', id);
   }
 
   @Get()
   async getAll(@Query() query: any) {
-    const { skip, limit } = query;
-    const events = await this.repository.findEvents({}, limit, skip);
-    return new SuccessResponse('success', events);
+    const events = await this.repository.findEvents({}, query.limit, query.skip);
+    return new SuccessResponse('success', events.map(event => event.toDto()));
   }
 }

@@ -12,3 +12,11 @@ export type UserWithResetPin = {
   user: UserDTO,
   resetPin: number
 }
+
+export type SendMailOptions = {
+  sender?: string;
+  subject: string;
+  recipients: string[];
+  message: string;
+  isHtml?: boolean;
+}
