@@ -20,3 +20,48 @@ export type SendMailOptions = {
   message: string;
   isHtml?: boolean;
 }
+
+export interface PaystackTransactionConfig {
+  amount: number
+  email: string
+  currency?: string
+  reference?: string | number
+  callback_url?: string
+  plan?: string
+  invoice_limit?: number
+  metadata?: any
+  channels?: string[] // ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
+  split_code?: string
+  subaccount?: string
+  bearer?: string
+  transaction_charge?: number
+}
+
+export interface PaystackValidationResponse {
+  status: boolean
+  message: string
+  data: {
+    id: string
+    domain: string
+    status: string
+    reference: string
+    amount: number
+    requested_amount: number
+    gateway_response: string
+    paidAt: string
+    createdAt: string
+    paid_at: string
+    created_at: string
+    channel: string
+    currency: string
+    fees: number
+    customer: {
+      id: string | number
+      first_name: string
+      last_name: string
+      email: string
+      customer_code: string
+      phone: string
+    }
+  }
+}

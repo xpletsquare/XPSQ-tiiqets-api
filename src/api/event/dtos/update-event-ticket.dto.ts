@@ -1,10 +1,13 @@
 
 
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 
 
 export class UpdateEventTicketDTO {
   eventId: string;
+
+  @IsUUID()
+  id: string
 
   @IsOptional()
   @IsString()

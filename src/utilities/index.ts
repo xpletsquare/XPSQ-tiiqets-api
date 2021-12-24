@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import { timestamp } from "rxjs";
 import { CONFIG } from "src/config";
 
 const qrcodeReader = require('qrcode');
@@ -103,4 +104,10 @@ export const getCartTicketKey = (eventId: string, ticketType: string) => ticketT
 
 export const envIsProd = () => {
   return process.env.NODE_ENV === 'production';
+}
+
+export const generatePaymentRef = () => {
+  const timeStamp = Date.now() + '';
+  const randomNumber = Math.round(Math.random() * 10000000) + '';
+  return parseInt(randomNumber + timestamp);
 }
