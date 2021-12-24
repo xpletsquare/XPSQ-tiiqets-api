@@ -15,6 +15,7 @@ export class CacheService {
   }
 
   async set(key: string, value: AnyObject, ttl = 0) {
+    console.log(key, value);
     const itemIsSet = await this.cacheManager.set(key, value, { ttl })
     console.log('new cache entry', key, itemIsSet)
   }

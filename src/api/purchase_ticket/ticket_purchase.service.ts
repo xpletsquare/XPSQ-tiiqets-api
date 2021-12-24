@@ -6,7 +6,7 @@ import { AxiosResponse } from 'axios';
 
 import { TicketPurchaseDocument } from './schemas/ticket_purchase.schema';
 import { TicketPurchase } from './schemas/ticket_purchase.schema';
-import CONFIG from '../../config';
+import { CONFIG as CONFIG } from 'src/config';
 
 @Injectable()
 export class TicketPurchaseService {
@@ -41,7 +41,7 @@ export class TicketPurchaseService {
             Authorization: `Bearer ${CONFIG.paystackSecret}`,
           },
         })
-        .toPromise();
+        .toPromise()
 
       return response?.data;
     } catch (err) {

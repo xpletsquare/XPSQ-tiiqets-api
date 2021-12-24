@@ -5,7 +5,9 @@ import { EventDocument } from '../event/schemas/event.schema';
 import { EventRepository } from '../event/event.repository';
 import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
 import { TicketPurchaseRepository } from './ticket_purchase.repository';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Purchases')
 @Controller('purchase-tickets')
 export class TicketPurchaseController {
   constructor(

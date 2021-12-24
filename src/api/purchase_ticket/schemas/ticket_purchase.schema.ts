@@ -26,4 +26,4 @@ export class TicketPurchase extends Document {
 }
 
 export type TicketPurchaseDocument = Document & TicketPurchase;
-export const TicketPurchaseSchema = SchemaFactory.createForClass(Event);
+export const TicketPurchaseSchema = SchemaFactory.createForClass(TicketPurchase);

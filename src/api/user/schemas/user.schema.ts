@@ -42,8 +42,8 @@ export type UserDocument = Document & User;
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.toDto = function () {
-  const { id, email, phone, firstName, lastName, activated } = this as UserDocument;
-  return { id, email, phone, firstName, lastName, activated }
+  const { id, email, phone, firstName, lastName, activated, flagged } = this as UserDocument;
+  return { id, email, phone, firstName, lastName, activated, flagged }
 }
 
 UserSchema.methods.checkPassword = function (password: string) {

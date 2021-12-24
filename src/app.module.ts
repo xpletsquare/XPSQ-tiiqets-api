@@ -2,17 +2,18 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule, Module } from '@nestjs/common';
 import { ApiModule } from './api/api.module';
-import { ENV_KEYS } from './keys';
+import { CONFIG } from './config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(ENV_KEYS.MONGO_URL),
+    MongooseModule.forRoot(CONFIG.MONGO_URL),
     EventEmitterModule.forRoot({
-      maxListeners: 10
+      maxListeners: 10,
+      global: true
     }),
     CacheModule.register({
       ttl: 30,
-      max: ENV_KEYS.NODE_ENV === 'development' ? 1000 : 1_000_000,
+      max: CONFIG.NODE_ENV === 'development' ? 1000 : 1_000_000,
       isGlobal: true
     }),
     ApiModule,

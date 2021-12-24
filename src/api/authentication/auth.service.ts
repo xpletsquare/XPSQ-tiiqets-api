@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { createJWTWithPayload, generatePin, hashPassword } from "src/utilities";
+import { createJWTWithPayload, generatePin, hashPassword, verifyAndDecodeJWTToken } from "src/utilities";
 import { CloudinaryHelper } from "src/utilities/cloudinary.service";
 import { UserRepository } from "../user/user.repository";
 import { ActivateUserDTO } from "./dtos/activateUser.dto";
@@ -10,6 +10,7 @@ import { UserService } from "../user/user.service";
 import { CreateUserDTO } from "../user/dtos/createUser.dto";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { APP_EVENTS } from "src/events";
+import { CreateTempUserDTO } from "../user/dtos/createTempUser.dto";
 
 
 @Injectable()
@@ -22,7 +23,18 @@ export class AuthService {
     private eventEmitterClient: EventEmitter2
   ) { }
 
-  cloudinaryHelper = new CloudinaryHelper;
+  private readonly cloudinaryHelper = new CloudinaryHelper;
+
+  async registerUser(details: CreateTempUserDTO) {
+    const userInCache = await this.cacheService.get(details.email) as UserWithActivationPin;
+
+    if (userInCache && userInCache?.user?.email) {
+      throw new BadRequestException('User exists with the above email');
+    }
+
+    const data = await this.userService.createTempUser(details);
+    return data;
+  }
 
   async loginAdmin(loginDetails) {
     // logic goes here
@@ -47,6 +59,8 @@ export class AuthService {
       throw new BadRequestException('Incorrect Email/Password');
     }
 
+    this.eventEmitterClient.emit(APP_EVENTS.UserLogin, user.toDto());
+
     return createJWTWithPayload(user.toDto());
   }
 
@@ -54,11 +68,11 @@ export class AuthService {
     const userInCache = await this.cacheService.get(dto.email) as UserWithActivationPin;
 
     if (!userInCache) {
-      return new BadRequestException('Sorry, no user found');
+      throw new BadRequestException('Sorry, no user found');
     }
 
     if (userInCache.activationPin !== dto.otp) {
-      return new BadRequestException('Incorrect OTP Entered');
+      throw new BadRequestException('Incorrect OTP Entered');
     }
 
     const user = await this.userService.saveActivatedUser(userInCache.user as CreateUserDTO);
@@ -77,6 +91,8 @@ export class AuthService {
         resetPin: generatePin()
       }
 
+      console.log(payload);
+
       this.eventEmitterClient.emit(APP_EVENTS.PasswordResetRequested, payload)
     }
   }
@@ -88,14 +104,19 @@ export class AuthService {
       throw new BadRequestException('Invalid Reset Pin Entered');
     }
 
-    return true;
+    const { token } = createJWTWithPayload(dataInCache.user);
+    return token as string;
   }
 
-  async changePasswordWithPin(email: string, pin: number, password: string) {
-    await this.validateResetPin(email, pin);
+  async changePasswordWithToken(token: string, password: string) {
+    const tokenPayload = verifyAndDecodeJWTToken(token);
+
+    if (!tokenPayload?.email) {
+      throw new BadRequestException('Invalid token');
+    }
 
     const hashedPassword = hashPassword(password);
-    const updated = await this.userService.updateUserInfo(email, { hashedPassword });
+    const updated = await this.userService.updateUserInfo(tokenPayload?.email, { hashedPassword });
 
     if (!updated) {
       throw new BadRequestException('Sorry, an unknown error occurred');
