@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
 } from 'class-validator';
 
 export class TicketPurchaseRequestDTO {
@@ -23,4 +22,5 @@ export class TicketPurchaseRequestDTO {
 export interface EventPurchaseItem {
   ticketId: string
   count: number
+  labels: string[]
 }

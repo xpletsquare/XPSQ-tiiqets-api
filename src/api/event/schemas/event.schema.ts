@@ -64,12 +64,12 @@ export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.methods.toDto = function () {
-  const { id, title, venue, date, status, startsAt, endsAt, description, image, tickets, category, tags, author } = this;
+  const { id, title, venue, date, status, startsAt, endsAt, description, image, tickets, category, tags, author } = this as any;
   return { id, title, venue, date, status, startsAt, endsAt, description, image, tickets, category, tags, author };
 }
 
 EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
-  const { tickets } = this;
+  const { tickets } = this as any;
   const ticket = tickets.find(ticket => [ticket.id, ticket.name].includes(ticketId));
   return ticket || null;
 }

@@ -8,6 +8,8 @@ import { generateId, generatePaymentRef } from 'src/utilities';
 import { PaystackService } from '../common/providers/paystack.service';
 import { CacheService } from '../common/providers/cache.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TicketPurchaseHelper } from './helper.service';
+import { TicketPurchaseRepository } from './ticket_purchase.repository';
 
 @Injectable()
 export class TicketPurchaseService {
@@ -16,20 +18,15 @@ export class TicketPurchaseService {
     private ticketPurchaseModel: Model<TicketPurchaseDocument>,
     private paystackService: PaystackService,
     private cacheService: CacheService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    private ticketPurchaseHelper: TicketPurchaseHelper,
+    private ticketPurchaseRepo: TicketPurchaseRepository
   ) {}
 
-  async initiatePurchase(purchaseData: TicketPurchaseRequestDTO) {
-    const ticketPurchase: Partial<TicketPurchase> = {
-      id: generateId(),
-      cost: 5000, // mock
-      paymentRef: generatePaymentRef(),
-      paymentDate: new Date().toISOString(),
-      paid: false,
-      purchases: purchaseData.purchases,
-      eventId: purchaseData.eventId,
-      userEmail: purchaseData.userEmail
-    }
+  async initiatePurchase(dto: TicketPurchaseRequestDTO) {
+    await this.ticketPurchaseHelper.validateTicketPurchases(dto);
+
+    const ticketPurchase = await this.ticketPurchaseHelper.createTempTicketPurchase(dto)
 
     const paystackResponse = await this.paystackService.initiateTransaction(ticketPurchase.userEmail, ticketPurchase.cost, ticketPurchase.paymentRef);
 
@@ -41,7 +38,10 @@ export class TicketPurchaseService {
     const key = `PURCHASE-${ticketPurchase.paymentRef}`;
     await this.cacheService.set(key, ticketPurchase);
 
-    return paystackResponse;
+    return {
+      purchase: ticketPurchase,
+      payment: paystackResponse
+    };
   }
 
   async verifyTicketPayment(reference_id: string) {
@@ -52,5 +52,16 @@ export class TicketPurchaseService {
     }
 
     this.eventEmitter.emit('ticket.purchase.verified', response);
+  }
+
+  async updateTicketPurchase(id: string, updates) {
+    const updated = await this.ticketPurchaseRepo.update(id, { ...updates });
+
+    if (!updated) {
+      throw new Error('Ticket purchase update failed');
+    }
+
+    const ticketPurchaseDetails = await this.ticketPurchaseRepo.findOne(id);
+    return ticketPurchaseDetails || null;
   }
 }

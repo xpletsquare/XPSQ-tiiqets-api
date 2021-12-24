@@ -107,7 +107,7 @@ export const envIsProd = () => {
 }
 
 export const generatePaymentRef = () => {
-  const timeStamp = Date.now() + '';
+  const timestamp = Date.now() + '';
   const randomNumber = Math.round(Math.random() * 10000000) + '';
   return parseInt(randomNumber + timestamp);
 }

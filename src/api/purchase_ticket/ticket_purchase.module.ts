@@ -12,10 +12,12 @@ import { EventModule } from '../event/event.module';
 import { CommonModule } from '../common/common.module';
 import { TicketPurchaseHelper } from './helper.service';
 import { TicketPurchaseEvents } from './ticket_purchase.events';
+import { EmailModule } from '../emails/email.module';
 
 @Module({
   imports: [
     CommonModule,
+    EmailModule,
     HttpModule,
     EventModule,
     MongooseModule.forFeature([

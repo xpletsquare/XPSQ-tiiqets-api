@@ -20,7 +20,7 @@ export class EventService {
       throw new NotFoundException('Event not found');
     }
 
-    return event.toDto();
+    return event;
   }
 
   async getTicketDetails(eventId: string, ticketId: string) {

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { EventTicket } from 'src/api/event/schemas/event-ticket.schema';
+import { EventTicketPurchase } from 'src/api/event/schemas/event-ticket.schema';
 import { EventPurchaseItem } from '../dtos/ticket_purchase.dto';
 
 @Schema({ timestamps: true })
@@ -12,7 +12,10 @@ export class TicketPurchase extends Document {
   eventId: string;
 
   @Prop({ required: true })
-  purchases: EventTicket[] | EventPurchaseItem[];
+  ticketSummary: EventTicketPurchase[] | EventPurchaseItem[];
+
+  @Prop()
+  tickets: any[];
 
   @Prop({ default: 0.0 })
   cost: number;
@@ -21,7 +24,7 @@ export class TicketPurchase extends Document {
   paid: boolean;
 
   @Prop()
-  paymentRef: number;
+  paymentRef: string;
 
   @Prop()
   userEmail: string;

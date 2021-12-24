@@ -34,6 +34,8 @@ export class EventTicketPurchase {
 
   amountToPurchase: number
 
+  labels: string[]
+
 }
 
 export class EventTicketUpdate {

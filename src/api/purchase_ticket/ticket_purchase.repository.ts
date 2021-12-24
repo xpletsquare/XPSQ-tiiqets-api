@@ -52,7 +52,6 @@ export class TicketPurchaseRepository {
 
   async update(id: string, updates: any = {}): Promise<boolean> {
     const data = await this.ticketPurchase.updateMany({ id }, updates);
-
     return data?.modifiedCount >= 1;
   }
 

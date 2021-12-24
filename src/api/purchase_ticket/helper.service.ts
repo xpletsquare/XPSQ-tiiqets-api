@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { generateId, generatePaymentRef } from "src/utilities";
 import { EventService } from "../event/event.service";
-import { EventTicket, EventTicketPurchase } from "../event/schemas/event-ticket.schema";
+import { EventTicketPurchase } from "../event/schemas/event-ticket.schema";
 import { EventPurchaseItem, TicketPurchaseRequestDTO } from "./dtos/ticket_purchase.dto";
+import { TicketPurchase } from "./schemas/ticket_purchase.schema";
 
 
 
@@ -12,9 +14,7 @@ export class TicketPurchaseHelper {
     private eventService: EventService
   ) { }
 
-  async validatePurchases(details: TicketPurchaseRequestDTO) {
-    // check if event is valid
-    // check if all tickets selected are valid
+  async validateTicketPurchases(details: TicketPurchaseRequestDTO) {
     const event = await this.eventService.getEvent(details.eventId);
 
     if (event.status !== 'ACTIVE') { // Check if date is passed
@@ -22,17 +22,25 @@ export class TicketPurchaseHelper {
     }
 
     const ticketsAreValid = details.purchases.every(purchase => {
-      const ticketExists = event.tickets.find(ticket => purchase.ticketId === ticket.id);
-      return ticketExists !== undefined;
+      const ticket = event.tickets.find(ticket => purchase.ticketId === ticket.id);
+
+      if (!ticket) {
+        return false
+      }
+
+      const canPurchaseWantedAmount = ticket.maxPossiblePurchases >= purchase.count;
+      const ticketNumbersAreAvailable = ticket.availableTickets >= purchase.count;
+
+      return ticketNumbersAreAvailable && canPurchaseWantedAmount;
     });
 
     if (!ticketsAreValid) {
-      throw new BadRequestException('One more tickets selected are invalid');
+      throw new BadRequestException('please check tickets and the requested quantities');
     }
 
   }
 
-  async formatRawPurchases(eventId: string, purchases: EventPurchaseItem[]): Promise<EventTicketPurchase[]> {
+  async getTicketsSummaryForPurchase(eventId: string, purchases: EventPurchaseItem[]): Promise<EventTicketPurchase[]> {
     // id, unitPrice, count, name, 
     const event = await this.eventService.getEvent(eventId);
 
@@ -47,11 +55,58 @@ export class TicketPurchaseHelper {
         description,
         eventId,
         amountToPurchase: purchase.count,
-        pricePerUnit: price
+        pricePerUnit: price,
+        labels: purchase.labels
       }
     });
 
     return ticketPurchaseData;
+  }
+
+  async createTempTicketPurchase(purchaseData: TicketPurchaseRequestDTO) {
+    const ticketSummary = await this.getTicketsSummaryForPurchase(purchaseData.eventId, purchaseData.purchases);
+    const cost = this.calculateCostOfPurchase(ticketSummary);
+
+    const ticketPurchase: Partial<TicketPurchase> = {
+      id: generateId(),
+      cost,
+      paymentRef: generatePaymentRef() + '',
+      paymentDate: new Date().toISOString(),
+      paid: false,
+      ticketSummary,
+      eventId: purchaseData.eventId,
+      userEmail: purchaseData.userEmail
+    }
+
+    return ticketPurchase;
+  }
+
+  async generateTicketData(eventId: string, ticketSummary: EventTicketPurchase, purchaseRef: string, userEmail: string) {
+    const event = await this.eventService.getEvent(eventId);
+    const labels = ticketSummary.labels || [];
+
+    const generatedTickets = [];
+
+    for (let index = 0; index < ticketSummary.amountToPurchase; index++) {
+      const ticket = {
+        id: generateId(),
+        userEmail,
+        label: labels[index] || '',
+        type: ticketSummary.name,
+        price: ticketSummary.pricePerUnit,
+        purchaseRef,
+        event: {
+          id: event.id,
+          title: event.title,
+          image: event.image,
+          venue: event.venue,
+        }
+      };
+
+      generatedTickets.push(ticket);
+    }
+
+    return generatedTickets;
   }
 
   calculateCostOfPurchase(purchases: EventTicketPurchase[]) {
@@ -63,4 +118,6 @@ export class TicketPurchaseHelper {
 
     return total;
   }
+
+
 }
