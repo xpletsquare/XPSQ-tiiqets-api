@@ -23,7 +23,7 @@ export class TicketPurchase extends Document {
   @Prop({ default: false })
   paid: boolean;
 
-  @Prop()
+  @Prop({ index: true })
   paymentRef: string;
 
   @Prop()

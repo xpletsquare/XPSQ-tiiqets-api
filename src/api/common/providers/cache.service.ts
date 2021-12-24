@@ -10,6 +10,7 @@ export class CacheService {
 
   readonly redis = redis;
   readonly ONE_HOUR = 60 * 60;
+  readonly TWENTY_FOUR_HOURS = 60 * 60 * 24
   readonly logger = new Logger()
 
   async get(key: string) {
@@ -17,7 +18,7 @@ export class CacheService {
     return data ? JSON.parse(data) : null;
   }
 
-  async set(key: string, value: any, ttl = this.ONE_HOUR) {
+  async set(key: string, value: any, ttl = this.TWENTY_FOUR_HOURS) {
     const valueAsstring = JSON.stringify(value);
     const itemIsSet = await this.redis.set(key, valueAsstring, 'ex', ttl)
     const log = ['new cache entry', key, itemIsSet].join('-');

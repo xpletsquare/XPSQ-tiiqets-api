@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TicketPurchaseDocument } from './schemas/ticket_purchase.schema';
@@ -15,7 +15,6 @@ import { TicketPurchaseRepository } from './ticket_purchase.repository';
 export class TicketPurchaseService {
   constructor(
     @InjectModel(TicketPurchase.name)
-    private ticketPurchaseModel: Model<TicketPurchaseDocument>,
     private paystackService: PaystackService,
     private cacheService: CacheService,
     private eventEmitter: EventEmitter2,
@@ -63,5 +62,28 @@ export class TicketPurchaseService {
 
     const ticketPurchaseDetails = await this.ticketPurchaseRepo.findOne(id);
     return ticketPurchaseDetails || null;
+  }
+
+  async getTicketPurchases(query = {}) {
+    const purchases = await this.ticketPurchaseRepo.find(query);
+    return purchases.map(purchase => {
+      const { tickets, _id, __v, ...rest } = purchase.toObject()
+      return rest;
+    })
+  }
+
+  async getSingleTicket(idOrReference) {
+    const purchase = await this.ticketPurchaseRepo.findOne('', {
+      $or: [
+        { id: idOrReference },
+        { paymentRef: idOrReference }
+      ]
+    });
+
+    if (!purchase) {
+      throw new NotFoundException('Purchase not found');
+    }
+
+    return purchase.toObject();
   }
 }

@@ -32,6 +32,13 @@ export class TicketPurchaseEvents {
     const ticketPurchaseDetails = await this.cacheService.get(key) as Partial<TicketPurchase>;
 
     if (!ticketPurchaseDetails) {
+      this.logger.log(`INVALID TICKET PURCHASE WITH REFERENCE - ${payload.data.reference}`)
+      return;
+    }
+
+    const ticketPurchaseInDb = await this.ticketPurchaseRepo.findOne('', { paymentRef: payload.data.reference });
+
+    if (ticketPurchaseInDb) {
       return;
     }
 
@@ -43,6 +50,7 @@ export class TicketPurchaseEvents {
     }
 
     this.eventEmitter.emit('ticket.purchase.saved', saved.toObject());
+    await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
   }
 
   @OnEvent('ticket.purchase.saved')
