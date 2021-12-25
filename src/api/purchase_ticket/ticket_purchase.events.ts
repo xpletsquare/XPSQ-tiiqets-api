@@ -80,7 +80,7 @@ export class TicketPurchaseEvents {
     if (payload.promoterCode) {
       this.eventEmitter.emit('event.promotion.credit', {
         promoterCode: payload.promoterCode,
-        amount: payload.cost * 0.02
+        amount: payload.cost * 0.02 // TODO: Move to Redis
       })
     }
 

@@ -1,4 +1,4 @@
-import { Body, CacheTTL, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, CacheTTL, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { ApiOkResponse, ApiProduces, ApiTags } from "@nestjs/swagger";
 import { getQRCode } from "src/utilities";
 import { SuccessResponse } from "src/utilities/successMessage";
@@ -43,13 +43,9 @@ export class UserController {
     return new SuccessResponse(this.responses.userFound, userInfo);
   }
 
-  @Post('qr')
-  async testQRGenerator(@Body() body) {
-    const qr = await getQRCode(body);
-    return new SuccessResponse('done', {
-      data: body,
-      qr
-    })
+  @Put(':id')
+  async updateUserInfo() {
+    return new SuccessResponse('user details updated', {})
   }
 
 }

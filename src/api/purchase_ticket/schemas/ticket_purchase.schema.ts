@@ -39,6 +39,12 @@ export class TicketPurchase extends Document {
   @Prop({ default: false })
   paid: boolean;
 
+  @Prop({ default: 0.0 })
+  refundAmount: number
+
+  @Prop({ default: false })
+  refunded: boolean;
+
   @Prop({ index: true })
   paymentRef: string;
 

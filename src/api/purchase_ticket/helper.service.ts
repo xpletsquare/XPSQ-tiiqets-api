@@ -7,7 +7,6 @@ import { EventPurchaseItem, TicketPurchaseRequestDTO } from "./dtos/ticket_purch
 import { TicketPurchase } from "./schemas/ticket_purchase.schema";
 
 
-
 @Injectable()
 export class TicketPurchaseHelper {
 
@@ -138,6 +137,8 @@ export class TicketPurchaseHelper {
 
     return total;
   }
+
+
 
 
 }
