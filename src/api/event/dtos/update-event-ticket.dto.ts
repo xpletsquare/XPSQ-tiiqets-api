@@ -4,6 +4,7 @@ import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 
 
 export class UpdateEventTicketDTO {
+  @IsUUID()
   eventId: string;
 
   @IsUUID()
@@ -11,25 +12,25 @@ export class UpdateEventTicketDTO {
 
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsNumber()
-  price: number
+  price?: number
 
   @IsOptional()
   @IsNumber()
-  availableTickets: number;
+  availableTickets?: number;
 
   @IsOptional()
   @IsNumber()
-  maxPossiblePurchases: number
+  maxPossiblePurchases?: number
 
   @IsOptional()
   @IsNumber()
-  endSalesAt: number;
+  endSalesAt?: number;
 }

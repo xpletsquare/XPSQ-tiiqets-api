@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { generateId, generatePaymentRef } from "src/utilities";
 import { EventService } from "../event/event.service";
 import { EventTicketPurchase } from "../event/schemas/event-ticket.schema";
@@ -11,7 +12,8 @@ import { TicketPurchase } from "./schemas/ticket_purchase.schema";
 export class TicketPurchaseHelper {
 
   constructor(
-    private eventService: EventService
+    private eventService: EventService,
+    private eventEmitter: EventEmitter2
   ) { }
 
   async validateTicketPurchases(details: TicketPurchaseRequestDTO) {
@@ -84,6 +86,22 @@ export class TicketPurchaseHelper {
 
   async generateTicketData(eventId: string, ticketSummary: EventTicketPurchase, purchaseRef: string, userEmail: string) {
     const event = await this.eventService.getEvent(eventId);
+
+    const canBuyTickets = await event.canBuyTicketAmount(ticketSummary.amountToPurchase, ticketSummary.id);
+
+    if (!canBuyTickets) {
+      console.log('insufficient ticket quantity');
+      this.eventEmitter.emit('initiate.ticket.refund', { ticketSummary, purchaseRef, userEmail });
+      return [];
+    }
+
+    const updated = await event.reduceTicketCount(ticketSummary.amountToPurchase, ticketSummary.id);
+
+    if (!updated) {
+      console.log('event ticket count update failed');
+      return [];
+    }
+
     const labels = ticketSummary.labels || [];
 
     const generatedTickets = [];

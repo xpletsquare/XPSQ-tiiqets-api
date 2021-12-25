@@ -51,13 +51,14 @@ export class Event extends Document {
   @Prop()
   author: string;
 
-  toDto(): Partial<Event> {
-    return
-  }
+  toDto: () => Partial<Event> 
 
-  findTicket(id: string): EventTicket {
-    return;
-  }
+  findTicket: (id: string) => EventTicket
+
+  canBuyTicketAmount: (amount: number, ticketId: string) => Promise<boolean>
+
+  reduceTicketCount: (amount: number, ticketId: string) => Promise<boolean>
+
 }
 
 export type EventDocument = Document & Event;
@@ -72,4 +73,35 @@ EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
   const { tickets } = this as any;
   const ticket = tickets.find(ticket => [ticket.id, ticket.name].includes(ticketId));
   return ticket || null;
+}
+
+EventSchema.methods.canBuyTicketAmount = function (amount: number, ticketId: string): boolean {
+  const ticket: EventTicket = this.findTicket(ticketId);
+
+  console.log('Available: ', ticket.availableTickets, '-- Required: ', amount);
+
+  if (!ticket) {
+    console.log('ticket not found');
+    return false;
+  }
+
+  return ticket.availableTickets >= amount;
+}
+
+EventSchema.methods.reduceTicketCount = async function (reduceBy: number, ticketId: string,) {
+  console.log('reducing event ticket count');
+  const ticket = this.findTicket(ticketId);
+
+  console.log(ticket);
+
+  const tickets = [...this.tickets];
+
+  ticket.availableTickets = ticket.availableTickets - reduceBy;
+
+  const index = tickets.findIndex(data => data.id === ticketId);
+
+  tickets[index] = ticket;
+  await this.update({ tickets });
+  console.log('ticket count updated');
+  return true;
 }

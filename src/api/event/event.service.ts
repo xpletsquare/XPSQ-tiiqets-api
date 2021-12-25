@@ -130,4 +130,5 @@ export class EventService {
 
     return ticketDetails;
   }
+
 }

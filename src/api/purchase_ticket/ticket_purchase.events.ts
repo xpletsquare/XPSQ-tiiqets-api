@@ -73,9 +73,9 @@ export class TicketPurchaseEvents {
 
     await this.mailSevice.sendPurchaseConfirmation(event.title, payload);
 
-    payload.tickets.forEach(ticket => {
-      this.mailSevice.sendTicketToUser(ticket);
-    })
+    // payload.tickets.forEach(ticket => {
+    //   this.mailSevice.sendTicketToUser(ticket);
+    // })
 
     if (payload.promoterCode) {
       this.eventEmitter.emit('event.promotion.credit', {
