@@ -8,9 +8,11 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SuccessResponse } from 'src/utilities/successMessage';
+import { LoggedInGuard } from '../authentication/guards/loggedIn.guard';
 import { CreateEventTicketDTO } from './dtos/create-event-ticket.dto';
 import { CreateEventDTO } from './dtos/create-event.dto';
 import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
@@ -25,24 +27,28 @@ export class EventController {
     private eventService: EventService
   ) { }
 
+  @UseGuards(LoggedInGuard)
   @Post()
   async createEvent(@Body() body: CreateEventDTO) {
     const event = await this.eventService.createEvent(body);
     return new SuccessResponse('Event created successfully', event);
   }
 
+  @UseGuards(LoggedInGuard)
   @Post('tickets')
   async createEventTicket(@Body() body: CreateEventTicketDTO) {
     await this.eventService.addEventTicket(body);
     return new SuccessResponse('Event Ticket Created');
   }
 
+  @UseGuards(LoggedInGuard)
   @Put('tickets')
   async modifyEventTicket(@Body() body: UpdateEventTicketDTO) {
     const updatedTicket = await this.eventService.updateEventTicket(body);
     return new SuccessResponse('Event Ticket Updated', updatedTicket);
   }
 
+  @UseGuards(LoggedInGuard)
   @ApiBody({
     description: 'Allows users to see their events'
   })
@@ -59,12 +65,14 @@ export class EventController {
     return new SuccessResponse('event retrieved', event);
   }
 
+  @UseGuards(LoggedInGuard)
   @Put(':id')
   async updateEvent(@Param('id') id: string, @Body() body: Partial<UpdateEventTicketDTO & Event>) {
     const updatedEvent = await this.eventService.updateEvent(id, body);
     return new SuccessResponse('event updated successfully', updatedEvent);
   }
 
+  @UseGuards(LoggedInGuard)
   @Delete(':id')
   async deleteEvent(@Param('id') id: string) {
     await this.eventService.deleteEvent(id);

@@ -14,7 +14,6 @@ import { TicketPurchaseRepository } from './ticket_purchase.repository';
 @Injectable()
 export class TicketPurchaseService {
   constructor(
-    @InjectModel(TicketPurchase.name)
     private paystackService: PaystackService,
     private cacheService: CacheService,
     private eventEmitter: EventEmitter2,

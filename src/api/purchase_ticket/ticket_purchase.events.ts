@@ -50,7 +50,7 @@ export class TicketPurchaseEvents {
     }
 
     this.eventEmitter.emit('ticket.purchase.saved', saved.toObject());
-    await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
+    // await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
   }
 
   @OnEvent('ticket.purchase.saved')
@@ -67,17 +67,34 @@ export class TicketPurchaseEvents {
       payload.tickets = [...payload.tickets, ...tickets];
     }
 
-    await this.ticketPurchaseService.updateTicketPurchase(payload.id, { tickets: payload.tickets });
-
     const event = await this.eventService.getEvent(payload.eventId);
 
-    const sent = await this.mailSevice.sendPurchaseConfirmation(event.title, payload);
+    await this.ticketPurchaseService.updateTicketPurchase(payload.id, { tickets: payload.tickets });
 
-    if (!sent) {
-      this.logger.error('TICKET PURCHASE UPDATE FAILED');
+    await this.mailSevice.sendPurchaseConfirmation(event.title, payload);
+
+    payload.tickets.forEach(ticket => {
+      this.mailSevice.sendTicketToUser(ticket);
+    })
+
+    if (payload.promoterCode) {
+      this.eventEmitter.emit('event.promotion.credit', {
+        promoterCode: payload.promoterCode,
+        amount: payload.cost * 0.02
+      })
     }
 
     this.eventEmitter.emit('tickets.generated', payload.tickets);
+  }
+
+  @OnEvent('event.promotion.credit')
+  async handleCreditUserRequest(payload) {
+    this.logger.log(`CREDIT REQUEST RECEIVED - PROMOTERCODE - ${payload.promoterCode}`);
+    console.log(payload);
+
+    // find user having promoterCode
+    // find user wallet
+    // topUp with credit amount
   }
 
 

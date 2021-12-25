@@ -17,10 +17,15 @@ export class TicketPurchaseRequestDTO {
 
   @IsEmail({}, { message: 'invalid user email' })
   userEmail: string;
+
+  @IsString()
+  @IsOptional()
+  promoterCode: string
 }
 
 export interface EventPurchaseItem {
   ticketId: string
   count: number
   labels: string[]
+  userEmail: string
 }

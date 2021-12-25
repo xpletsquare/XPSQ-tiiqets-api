@@ -75,7 +75,8 @@ export class TicketPurchaseHelper {
       paid: false,
       ticketSummary,
       eventId: purchaseData.eventId,
-      userEmail: purchaseData.userEmail
+      userEmail: purchaseData.userEmail,
+      promoterCode: purchaseData.promoterCode || null
     }
 
     return ticketPurchase;
@@ -100,6 +101,7 @@ export class TicketPurchaseHelper {
           title: event.title,
           image: event.image,
           venue: event.venue,
+          date: event.date
         }
       };
 

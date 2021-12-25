@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { timestamp } from "rxjs";
 import { CONFIG } from "src/config";
+import { customAlphabet } from 'nanoid'
+const nanoid = customAlphabet('1234567890ABCDEFGHIJKLMNPQRSTUV', 10)
 
 const qrcodeReader = require('qrcode');
 const jwt = require('jsonwebtoken');
@@ -84,7 +85,7 @@ export const generatePin = (numLength = 6) => {
   return Math.round(randomFloat);
 }
 
-export const getQRCode = async (value: unknown): Promise<string> => {
+export const getQRCode = async (value): Promise<string> => {
   return new Promise((resolve) => {
     const valueAsString = JSON.stringify(value);
 
@@ -111,3 +112,5 @@ export const generatePaymentRef = () => {
   const randomNumber = Math.round(Math.random() * 10000000) + '';
   return parseInt(randomNumber + timestamp);
 }
+
+export const generatePromoterCode = () => nanoid();

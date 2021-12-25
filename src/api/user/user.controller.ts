@@ -1,6 +1,8 @@
-import { CacheTTL, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, CacheTTL, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { ApiOkResponse, ApiProduces, ApiTags } from "@nestjs/swagger";
+import { getQRCode } from "src/utilities";
 import { SuccessResponse } from "src/utilities/successMessage";
+import { AdminGuard } from "../authentication/guards/admin.guard";
 import { SingleUserResponse, UserListResponse } from "./responses";
 import { UserService } from "./user.service";
 
@@ -23,6 +25,7 @@ export class UserController {
     description: 'Users Retrieved',
     type: UserListResponse
   })
+  @UseGuards(AdminGuard)
   @CacheTTL(30) // Save response in cache for 30 seconds
   @Get()
   async getUsers() {
@@ -38,6 +41,15 @@ export class UserController {
   async getUserInfo(@Param('id') id: string) {
     const userInfo = await this.userService.getSingleUser(id);
     return new SuccessResponse(this.responses.userFound, userInfo);
+  }
+
+  @Post('qr')
+  async testQRGenerator(@Body() body) {
+    const qr = await getQRCode(body);
+    return new SuccessResponse('done', {
+      data: body,
+      qr
+    })
   }
 
 }

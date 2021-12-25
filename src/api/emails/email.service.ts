@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { UserDTO } from "src/interfaces";
 import { MailgunService } from "../common/providers/mailgun.service";
-import { TicketPurchase } from "../purchase_ticket/schemas/ticket_purchase.schema";
+import { TicketPurchase, TicketPurchased } from "../purchase_ticket/schemas/ticket_purchase.schema";
 import { generateLoginAlertEmail } from "./inline-templates/login.email";
 import { generatePurchaseReceiptEmail } from "./inline-templates/purchase-receipt.email";
+import { generateTicketEmail } from "./inline-templates/ticket.email";
 import { generateUserActivationEmail } from "./inline-templates/userActivation.email";
 import { generateWelcomeEmail } from "./inline-templates/welcome.email";
 
@@ -67,6 +68,24 @@ export class EmailService {
       recipients: ['kenovienadu@gmail.com'],
       isHtml: true,
       subject: 'Thanks for your Ticket Purchase - Uzu Tickets',
+      sender: 'Uzu Tickets <purchases@uzutickets.com>'
+    })
+
+    return sent || null;
+  }
+
+  async sendTicketToUser(ticketDetails: TicketPurchased) {
+    // if (!ticketDetails.userEmail) {
+    //   return;
+    // }
+
+    const html = await generateTicketEmail(ticketDetails);
+
+    const sent = await this.mailgunService.sendMail({
+      message: html,
+      recipients: ['kenovienadu@gmail.com'],
+      isHtml: true,
+      subject: `Ticket Details - Uzu Tickets - ${ticketDetails.id}`,
       sender: 'Uzu Tickets <purchases@uzutickets.com>'
     })
 
