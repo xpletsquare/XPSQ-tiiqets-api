@@ -9,9 +9,15 @@ import {
   TicketPurchaseSchema,
 } from './schemas/ticket_purchase.schema';
 import { EventModule } from '../event/event.module';
+import { CommonModule } from '../common/common.module';
+import { TicketPurchaseHelper } from './helper.service';
+import { TicketPurchaseEvents } from './ticket_purchase.events';
+import { EmailModule } from '../emails/email.module';
 
 @Module({
   imports: [
+    CommonModule,
+    EmailModule,
     HttpModule,
     EventModule,
     MongooseModule.forFeature([
@@ -22,6 +28,11 @@ import { EventModule } from '../event/event.module';
     ]),
   ],
   controllers: [TicketPurchaseController],
-  providers: [TicketPurchaseRepository, TicketPurchaseService],
+  providers: [
+    TicketPurchaseRepository,
+    TicketPurchaseService,
+    TicketPurchaseHelper,
+    TicketPurchaseEvents
+  ],
 })
 export class TicketPurchaseModule {}

@@ -5,7 +5,6 @@ import {
   TicketPurchase,
   TicketPurchaseDocument,
 } from './schemas/ticket_purchase.schema';
-import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
 import { generateId } from 'src/utilities';
 
 @Injectable()
@@ -15,14 +14,13 @@ export class TicketPurchaseRepository {
     private ticketPurchase: Model<TicketPurchaseDocument>,
   ) {}
 
-  async create(dto: TicketPurchaseRequestDTO) {
-    const purchaseData = {
-      id: generateId(),
-      purchases: dto.purchases,
+  async create(data: Partial<TicketPurchase>) {
+    const dataToSave = {
+      ...data,
+      id: generateId()
     };
 
-    const event = await this.ticketPurchase.create(purchaseData);
-
+    const event = await this.ticketPurchase.create(dataToSave);
     return event || null;
   }
 
@@ -54,7 +52,6 @@ export class TicketPurchaseRepository {
 
   async update(id: string, updates: any = {}): Promise<boolean> {
     const data = await this.ticketPurchase.updateMany({ id }, updates);
-
     return data?.modifiedCount >= 1;
   }
 

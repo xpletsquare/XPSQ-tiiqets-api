@@ -1,9 +1,7 @@
-import { Optional } from '@nestjs/common';
 import {
   IsArray,
-  IsDecimal,
+  IsEmail,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -11,12 +9,23 @@ import {
 export class TicketPurchaseRequestDTO {
   @IsOptional()
   @IsString()
-  id: string;
+  eventId: string;
 
   @IsArray()
   @IsNotEmpty({ message: 'purchases must be provided' })
-  purchases: {
-    event_id: string;
-    tickets: { id: string; name: string; count: number }[];
-  }[];
+  purchases: EventPurchaseItem[];
+
+  @IsEmail({}, { message: 'invalid user email' })
+  userEmail: string;
+
+  @IsString()
+  @IsOptional()
+  promoterCode: string
+}
+
+export interface EventPurchaseItem {
+  ticketId: string
+  count: number
+  labels: string[]
+  userEmail: string
 }

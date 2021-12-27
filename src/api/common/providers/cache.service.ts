@@ -1,35 +1,39 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { Cache } from 'cache-manager';
-import { AnyObject } from "mongoose";
+import { Injectable, Logger } from "@nestjs/common";
+import { getCacheKeys, redis } from "src/redis";
 
 
 @Injectable()
 export class CacheService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
+  readonly redis = redis;
+  readonly ONE_HOUR = 60 * 60;
+  readonly TWENTY_FOUR_HOURS = 60 * 60 * 24
+  readonly logger = new Logger()
+
   async get(key: string) {
-    const data = await this.cacheManager.get(key);
-    return data;
+    const data = await this.redis.get(key);
+    return data ? JSON.parse(data) : null;
   }
 
-  async set(key: string, value: AnyObject, ttl = 0) {
-    console.log(key, value);
-    const itemIsSet = await this.cacheManager.set(key, value, { ttl })
-    console.log('new cache entry', key, itemIsSet)
+  async set(key: string, value: any, ttl = this.TWENTY_FOUR_HOURS) {
+    const valueAsstring = JSON.stringify(value);
+    const itemIsSet = await this.redis.set(key, valueAsstring, 'ex', ttl)
+    const log = ['new cache entry', key, itemIsSet].join('-');
+    this.logger.log(log);
   }
 
   async clear() {
-    await this.cacheManager.reset();
+    await this.redis
   }
 
   async del(key: string) {
-    await this.cacheManager.del(key);
+    await this.redis.del(key);
   }
 
   async logCacheKeys() {
-    const keys = await this.cacheManager.store.keys() as string[];
-    console.log(keys);
+    getCacheKeys()
   }
 }

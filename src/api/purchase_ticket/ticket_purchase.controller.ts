@@ -1,40 +1,47 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { throwHttpError } from 'src/utilities/errorMessage';
 import { SuccessResponse } from 'src/utilities/successMessage';
-import { EventDocument } from '../event/schemas/event.schema';
-import { EventRepository } from '../event/event.repository';
 import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
-import { TicketPurchaseRepository } from './ticket_purchase.repository';
 import { ApiTags } from '@nestjs/swagger';
+import { TicketPurchaseService } from './ticket_purchase.service';
+import { LoggedInGuard } from '../authentication/guards/loggedIn.guard';
 
 @ApiTags('Purchases')
 @Controller('purchase-tickets')
 export class TicketPurchaseController {
   constructor(
-    private repository: TicketPurchaseRepository,
-    private eventRepo: EventRepository,
+    private ticketPurchaseService: TicketPurchaseService
   ) {}
 
-  @Post()
-  async create(@Body() body: TicketPurchaseRequestDTO) {
-    const { purchases } = body;
-    let totalPayment = 0;
+  @Post('initiate')
+  async initiatePurchase(@Body() body: TicketPurchaseRequestDTO) {
+    const data = await this.ticketPurchaseService.initiatePurchase(body);
+    return new SuccessResponse('success', data);
+  }
 
-    for (let i = 0; i < purchases.length; i++) {
-      const { event_id = 'null', tickets } = purchases[i];
+  @UseGuards(LoggedInGuard)
+  @Get('recents')
+  async getRecentTicketPurchases() {
+    const purchases = await this.ticketPurchaseService.getTicketPurchases();
+    return new SuccessResponse('success', purchases);
+  }
 
-      const _event: EventDocument = await this.eventRepo.findOne(event_id);
-      if (!_event) throw throwHttpError(404, 'Event does not exist');
+  @UseGuards(LoggedInGuard)
+  @Get('event/:eventId')
+  async getEventTicketPurchases(@Param('eventId') eventId: string) {
+    const purchases = await this.ticketPurchaseService.getTicketPurchases({ eventId });
+    return new SuccessResponse('success', purchases);
+  }
 
-      tickets.map(({ id, count }) => {
-        const selectedTicket = _event.tickets.find(
-          (ticket) => ticket.id === id,
-        );
+  @Get('single/:idOrReference')
+  async getSinglePurchase(@Param('idOrReference') idOrReference: string) {
+    const purchase = await this.ticketPurchaseService.getSingleTicket(idOrReference);
+    return new SuccessResponse('success', purchase);
+  }
 
-        if (selectedTicket) totalPayment += +selectedTicket.price * +count;
-      });
-
-      return new SuccessResponse('Event created successfully', totalPayment);
-    }
+  @Get('webhook')
+  async paymentWebhook(@Query('txref') txref: string) {
+    await this.ticketPurchaseService.verifyTicketPayment(txref);
+    return new SuccessResponse();
   }
 }

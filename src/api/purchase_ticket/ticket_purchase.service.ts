@@ -1,52 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { HttpService } from '@nestjs/axios';
 import { Model } from 'mongoose';
-import { AxiosResponse } from 'axios';
-
 import { TicketPurchaseDocument } from './schemas/ticket_purchase.schema';
 import { TicketPurchase } from './schemas/ticket_purchase.schema';
-import { CONFIG as CONFIG } from 'src/config';
+import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
+import { generateId, generatePaymentRef } from 'src/utilities';
+import { PaystackService } from '../common/providers/paystack.service';
+import { CacheService } from '../common/providers/cache.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TicketPurchaseHelper } from './helper.service';
+import { TicketPurchaseRepository } from './ticket_purchase.repository';
 
 @Injectable()
 export class TicketPurchaseService {
   constructor(
-    @InjectModel(TicketPurchase.name)
-    private ticketPurchaseModel: Model<TicketPurchaseDocument>,
-    private httpClient: HttpService,
+    private paystackService: PaystackService,
+    private cacheService: CacheService,
+    private eventEmitter: EventEmitter2,
+    private ticketPurchaseHelper: TicketPurchaseHelper,
+    private ticketPurchaseRepo: TicketPurchaseRepository
   ) {}
 
-  async subscribe(payload: any): Promise<AxiosResponse> {
-    try {
-      const response = await this.httpClient
-        .post(`${CONFIG.paystackURL}/transaction/initialize`, payload, {
-          headers: {
-            Authorization: `Bearer ${CONFIG.paystackSecret}`,
-          },
-        })
-        .toPromise();
+  async initiatePurchase(dto: TicketPurchaseRequestDTO) {
+    await this.ticketPurchaseHelper.validateTicketPurchases(dto);
 
-      return response?.data;
-    } catch (err) {
-      console.log('error: ', err);
-      return null;
+    const ticketPurchase = await this.ticketPurchaseHelper.createTempTicketPurchase(dto)
+
+    const paystackResponse = await this.paystackService.initiateTransaction(ticketPurchase.userEmail, ticketPurchase.cost, ticketPurchase.paymentRef);
+
+    if (!paystackResponse) {
+      throw new BadRequestException('Unable to proceed. Please try again later');
     }
+
+    // save ticket purchase to redis
+    const key = `PURCHASE-${ticketPurchase.paymentRef}`;
+    await this.cacheService.set(key, ticketPurchase);
+
+    return {
+      purchase: ticketPurchase,
+      payment: paystackResponse
+    };
   }
 
-  async verifyPayment(reference_id: string): Promise<AxiosResponse> {
-    try {
-      const response = await this.httpClient
-        .get(`${CONFIG.paystackURL}/transaction/verify/${reference_id}`, {
-          headers: {
-            Authorization: `Bearer ${CONFIG.paystackSecret}`,
-          },
-        })
-        .toPromise()
+  async verifyTicketPayment(reference_id: string) {
+    const response = await this.paystackService.verifyTransaction(reference_id);
 
-      return response?.data;
-    } catch (err) {
-      console.log('error: ', err);
-      return null;
+    if (!response?.data?.paidAt) {
+      throw new BadRequestException('Invalid purchase');
     }
+
+    this.eventEmitter.emit('ticket.purchase.verified', response);
+  }
+
+  async updateTicketPurchase(id: string, updates) {
+    const updated = await this.ticketPurchaseRepo.update(id, { ...updates });
+
+    if (!updated) {
+      throw new Error('Ticket purchase update failed');
+    }
+
+    const ticketPurchaseDetails = await this.ticketPurchaseRepo.findOne(id);
+    return ticketPurchaseDetails || null;
+  }
+
+  async getTicketPurchases(query = {}) {
+    const purchases = await this.ticketPurchaseRepo.find(query);
+    return purchases.map(purchase => {
+      const { tickets, _id, __v, ...rest } = purchase.toObject()
+      return rest;
+    })
+  }
+
+  async getSingleTicket(idOrReference) {
+    const purchase = await this.ticketPurchaseRepo.findOne('', {
+      $or: [
+        { id: idOrReference },
+        { paymentRef: idOrReference }
+      ]
+    });
+
+    if (!purchase) {
+      throw new NotFoundException('Purchase not found');
+    }
+
+    return purchase.toObject();
   }
 }

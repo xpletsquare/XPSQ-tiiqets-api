@@ -3,7 +3,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { FilterQuery } from "mongoose";
 import { APP_EVENTS } from "src/events";
 import { UserDTO, UserWithActivationPin } from "src/interfaces";
-import { createJWTWithPayload, generateId, generatePin, hashPassword } from "src/utilities";
+import { createJWTWithPayload, generateId, generatePin, generatePromoterCode, hashPassword } from "src/utilities";
 import { CacheService } from "../common/providers/cache.service";
 import { CreateTempUserDTO } from "./dtos/createTempUser.dto";
 import { CreateUserDTO } from "./dtos/createUser.dto";
@@ -69,7 +69,8 @@ export class UserService {
       email: dto.email.toLowerCase(),
       phone: dto.phone,
       hashedPassword: hashPassword(dto.password),
-      activated: false
+      activated: false,
+      promoterCode: generatePromoterCode()
     };
 
     const userWithPin: UserWithActivationPin = {

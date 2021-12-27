@@ -23,7 +23,8 @@ export class EventRepository {
       startsAt: dto.startsAt,
       endsAt: dto.endsAt,
       image: dto.image,
-      category: dto.category
+      category: dto.category,
+      author: dto.author,
       // TODO: Implement Location Tracking
       // location: {
       //   longitude: dto.longitude,
@@ -62,8 +63,9 @@ export class EventRepository {
     return events;
   }
 
-  async updateEvent(id: string, updates: any = {}): Promise<boolean> {
-    const data = await this.eventModel.updateMany({ id }, updates);
+  async updateEvent(eventId: string, updates: Partial<Event> = {}): Promise<boolean> {
+    const { id, author, ...restOfUpdate } = updates;
+    const data = await this.eventModel.updateMany({ id: eventId }, restOfUpdate);
 
     return data?.modifiedCount >= 1;
   }

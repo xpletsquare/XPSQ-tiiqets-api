@@ -1,32 +1,36 @@
 
 
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 
 
 export class UpdateEventTicketDTO {
+  @IsUUID()
   eventId: string;
 
-  @IsOptional()
-  @IsString()
-  name: string;
+  @IsUUID()
+  id: string
 
   @IsOptional()
   @IsString()
-  description: string;
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsOptional()
   @IsNumber()
-  price: number
+  price?: number
 
   @IsOptional()
   @IsNumber()
-  availableTickets: number;
+  availableTickets?: number;
 
   @IsOptional()
   @IsNumber()
-  maxPossiblePurchases: number
+  maxPossiblePurchases?: number
 
   @IsOptional()
   @IsNumber()
-  endSalesAt: number;
+  endSalesAt?: number;
 }
