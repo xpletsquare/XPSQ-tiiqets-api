@@ -6,7 +6,7 @@ export const CONFIG = {
   JWT_SECRET: process.env.JWT_SECRET || 'tiq-secret-secret',
   SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL || 'testsuperadmin@gmail.com',
   SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD || '@password123',
-  PORT: process.env.PORT ? parseInt(process.env.PORT) : 3000,
+  PORT: process.env.PORT ? parseInt(process.env.PORT) : 3200,
   NODE_ENV: process.env.NODE_ENV || 'development',
   REDIS_URL: process.env.REDIS_URL || '',
 

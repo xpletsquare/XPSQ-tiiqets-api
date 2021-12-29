@@ -18,6 +18,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('v1/api');
+  app.enableCors();
 
   await app.listen(CONFIG.PORT);
   console.log(`APPLICATION STARTED ON PORT ${CONFIG.PORT}`)
