@@ -81,7 +81,7 @@ export const generatePin = (numLength = 6) => {
     return 123456;
   }
 
-  const randomFloat = Math.random() * (10 ^ numLength);
+  const randomFloat = Math.random() * 10 ** numLength;
   return Math.round(randomFloat);
 }
 
