@@ -21,15 +21,17 @@ export class UserEventListeners {
     const TWENTY_FOUR_HOURS = 60 * 60 * 24;
     await this.cacheService.set(payload.user.email, payload, TWENTY_FOUR_HOURS);
 
+    console.log({ user: payload.user.email, activationPin: payload.activationPin });
+
     // send activation email
     await this.emailService.sendActivationOTP(payload.user as UserDTO, payload.activationPin)
   }
 
   @OnEvent(APP_EVENTS.UserActivated)
   async onUserActivated(payload: CreateUserDTO) {
-    await this.cacheService.del(payload.email);
     await this.emailService.sendActivationSuccess(payload.firstName, payload.email);
     await this.emailService.sendWelcomeEmail(payload);
+    await this.cacheService.del(payload.email);
   }
 
   @OnEvent(APP_EVENTS.UserLogin)
