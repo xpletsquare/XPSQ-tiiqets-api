@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      padding: 10vh 10vw;
+      background-color: rgb(243, 243, 243);
+      color: #1f1f1f;
+      font-size: 1.1em;
+    }
+
+    main{
+      max-width: 700px;
+      margin: 1em auto;
+      background-color: white;
+      box-shadow: 0px 0px 20px  lightgray;
+      padding: 3em;
+    }
+
+    img{
+      width: 100%;
+      border-radius: 3px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    div{
+      margin: 1em 0;
+    }
+
+    .order-card{
+      border: 1px solid lightgray;
+      padding: 2em;
+    }
+
+    .price, .title, .total{
+      font-weight: 700;
+      font-size: 1em;
+    }
+
+    .total{
+      font-size: 1.7em;
+    }
+
+    .flex-between{
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .flex-between span{
+      display: inline-block;
+      max-width: 70%;
+    }
+
+    .border-bottom{
+      border-bottom: 1px solid lightgray;
+      padding: 1em 0;
+    }
+
+    .lighter{
+      opacity: 0.5;
+      font-size: 0.8em;
+    }
+
+    .footer{
+      margin-top: 100px;
+      opacity: 0.5;
+      font-size: 0.8em;
+    }
+
+    @media screen and (max-width: 700px) {
+      body{
+        padding: 0;
+      }
+
+      .flex-between{
+        display: block;
+      }
+
+      .flex-between span{
+        display: block;
+        padding: 0.5em 0;
+        width: 100%;
+      }
+
+      main{
+        padding: 1em;
+      }
+
+      .order-card{
+        padding: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- <img src="https://res.cloudinary.com/dk07kf3yl/image/upload/v1640155875/temp/Fastes_way_to_puchase_tickets_ei12v2.png" alt=""> -->
+
+    <div class="message">Thank you for purchasing tickets from Uzu Tickets.</div>
+
+    <div class="order-card">
+      <div class="title">Order Summary</div>
+      <div class="flex-between border-bottom">
+        <span>Event</span>
+        <span>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi, impedit!</span>
+      </div>
+
+      <div class="flex-between border-bottom">
+        <span>VIP Tickets <span class="lighter">x 5</span> </span>
+        <span class="price">N10,000</span>
+      </div>
+
+      <div class="flex-between border-bottom">
+        <span>VIP Tickets <span class="lighter">x 5</span></span>
+        <span class="price">N10,000</span>
+      </div>
+
+      <div class="flex-between">
+        <span>Total</span>
+        <span class="total">N100,000</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>This email was intended for user@gmail.com. If you received this by mistake or have any questions, please reach out to us on
+      support@uzutickets.com.</div>
+
+      <div>&copy; 2021 Uzu Tickets</div>
+    </div>
+  </main>
+</body>
+</html>
