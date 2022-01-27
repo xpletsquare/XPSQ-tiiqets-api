@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -7,6 +7,7 @@ import { UserDTO } from "src/interfaces";
 import { generateId } from "src/utilities";
 import { BankDetailDocument, BankDetails } from "./schemas/bankDetails.schema";
 import { Wallet, WalletDocument } from "./schemas/wallet.schema";
+import { WalletHelpers } from "./wallet.helper";
 
 
 @Injectable()
@@ -19,61 +20,25 @@ export class WalletService {
     private walletModel: Model<WalletDocument>,
 
     @InjectModel(BankDetails.name)
-    private bankWalletDetails: Model<BankDetailDocument>
+    private bankWalletDetails: Model<BankDetailDocument>,
+
+    private walletHelper: WalletHelpers
   ) { }
 
   @OnEvent(APP_EVENTS.UserActivated)
   async createWallet(payload: UserDTO) {
-    const exists = await this.walletModel.exists({ user: payload.id });
 
-    if (exists) {
-      return;
-    }
-
-    const bankDetails = await this.bankWalletDetails.create({
-      id: generateId(),
-      user: payload.id,
-    })
-
-    const wallet = await this.walletModel.create({
-      id: generateId(),
-      user: payload.id,
-      balance: 0,
-      bankDetailsId: bankDetails.id
-    })
-
-    this.logger.log(`Wallet (${wallet.id}) created for user (${wallet.user})`)
   }
 
   async getUserWallet(userId: string) {
 
-    const wallets = await this.walletModel.aggregate([
-      {
-        $match: {
-          user: userId
-        }
-      },
-      {
-        $lookup: {
-          from: 'bankdetails',
-          localField: "bankDetailsId",
-          foreignField: "id",
-          as: "bankInfo"
-        }
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: "user",
-          foreignField: "id",
-          as: "userInfo"
-        }
-      }
-    ]).unwind("bankInfo", "userInfo").exec();
+    const wallet = this.walletHelper.getUserWallet(userId);
 
-    const userWallet = wallets[0];
+    if (!wallet) {
+      throw new NotFoundException('No wallet found for user');
+    }
 
-    return userWallet;
+    return wallet;
   }
 
   getSingleWithdrawalRequest() { }

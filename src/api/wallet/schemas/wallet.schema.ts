@@ -20,6 +20,9 @@ export class Wallet {
   @Prop()
   bankDetailsId: string
 
+  @Prop({ default: false })
+  locked: boolean;
+
 }
 
 export type WalletDocument = Document & Wallet;
