@@ -81,8 +81,13 @@ export const generatePin = (numLength = 6) => {
     return 123456;
   }
 
-  const randomFloat = Math.random() * 10 ** numLength;
-  return Math.round(randomFloat);
+  let pin = '';
+
+  for (let i = 0; i < numLength; i++) {
+    pin += Math.random() * 10;
+  }
+
+  return parseInt(pin);
 }
 
 export const getQRCode = async (value): Promise<string> => {

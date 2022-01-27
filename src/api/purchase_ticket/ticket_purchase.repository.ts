@@ -6,12 +6,14 @@ import {
   TicketPurchaseDocument,
 } from './schemas/ticket_purchase.schema';
 import { generateId } from 'src/utilities';
+import { EventService } from '../event/event.service';
 
 @Injectable()
 export class TicketPurchaseRepository {
   constructor(
     @InjectModel(TicketPurchase.name)
     private ticketPurchase: Model<TicketPurchaseDocument>,
+    private eventService: EventService,
   ) {}
 
   async create(data: Partial<TicketPurchase>) {
@@ -59,5 +61,37 @@ export class TicketPurchaseRepository {
     const data = await this.ticketPurchase.deleteOne({ id });
 
     return data?.deletedCount >= 1;
+  }
+
+  async getSummary(eventId: string) {
+    const event = await this.eventService.getEvent(eventId);
+
+    const summaryMatch = { eventId, paid: true };
+    const numberOfPurchases = await this.ticketPurchase.countDocuments(summaryMatch);
+
+    const data = await this.ticketPurchase.aggregate([
+      { $match: summaryMatch },
+      {
+        $group: {
+          _id: "$eventId",
+          total: {
+            $sum: "$cost"
+          }
+        },
+      }
+    ]);
+
+    const ticketSummary = event.tickets.map((ticket) => {
+      return {
+        ...ticket,
+        valueSold: ticket.nSold * ticket.price
+      }
+    })
+
+    return {
+      numberOfPurchases,
+      total: data[0].total,
+      ticketSummary
+    }
   }
 }

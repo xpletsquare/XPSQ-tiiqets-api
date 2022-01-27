@@ -29,8 +29,10 @@ export class TicketPurchaseHelper {
         return false
       }
 
-      const canPurchaseWantedAmount = ticket.maxPossiblePurchases >= purchase.count;
-      const ticketNumbersAreAvailable = ticket.availableTickets >= purchase.count;
+      const canPurchaseWantedAmount = ticket.maxPurchases >= purchase.count;
+
+      const available = ticket.nLimit - ticket.nSold;
+      const ticketNumbersAreAvailable = available >= purchase.count;
 
       return ticketNumbersAreAvailable && canPurchaseWantedAmount;
     });
@@ -94,7 +96,7 @@ export class TicketPurchaseHelper {
       return [];
     }
 
-    const updated = await event.reduceTicketCount(ticketSummary.amountToPurchase, ticketSummary.id);
+    const updated = await event.updateTicketCount(ticketSummary.amountToPurchase, ticketSummary.id);
 
     if (!updated) {
       console.log('event ticket count update failed');

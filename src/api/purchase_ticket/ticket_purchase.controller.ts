@@ -39,6 +39,12 @@ export class TicketPurchaseController {
     return new SuccessResponse('success', purchase);
   }
 
+  @Get('summary/:eventId')
+  async getPurchaseSummary(@Param('eventId') eventId: string) {
+    const summary = await this.ticketPurchaseService.getPurchaseSummaryForEvent(eventId);
+    return new SuccessResponse('success', summary);
+  }
+
   @Get('webhook')
   async paymentWebhook(@Query('txref') txref: string) {
     await this.ticketPurchaseService.verifyTicketPayment(txref);
