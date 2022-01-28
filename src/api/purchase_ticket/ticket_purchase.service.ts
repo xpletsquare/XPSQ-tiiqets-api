@@ -1,10 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { TicketPurchaseDocument } from './schemas/ticket_purchase.schema';
-import { TicketPurchase } from './schemas/ticket_purchase.schema';
 import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
-import { generateId, generatePaymentRef } from 'src/utilities';
 import { PaystackService } from '../common/providers/paystack.service';
 import { CacheService } from '../common/providers/cache.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -84,5 +79,10 @@ export class TicketPurchaseService {
     }
 
     return purchase.toObject();
+  }
+
+  async getPurchaseSummaryForEvent(eventId: string) {
+    const results = await this.ticketPurchaseRepo.getSummary(eventId);
+    return results;
   }
 }

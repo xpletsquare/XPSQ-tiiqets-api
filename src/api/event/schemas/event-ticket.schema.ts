@@ -12,9 +12,11 @@ export class EventTicket {
 
   price: number;
 
-  availableTickets: number;
+  nLimit: number;
 
-  maxPossiblePurchases: number
+  nSold: number;
+
+  maxPurchases: number
 
   endSalesAt: number;
 

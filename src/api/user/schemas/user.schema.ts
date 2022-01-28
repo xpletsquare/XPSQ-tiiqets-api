@@ -36,9 +36,7 @@ export class User extends Document {
     return
   } // implemented in schema methods
 
-  checkPassword(password: string): boolean { // implemented in schema methods
-    return;
-  }
+  checkPassword: (password: string) => boolean
 }
 
 export type UserDocument = Document & User;

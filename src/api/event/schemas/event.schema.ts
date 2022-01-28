@@ -57,7 +57,7 @@ export class Event extends Document {
 
   canBuyTicketAmount: (amount: number, ticketId: string) => Promise<boolean>
 
-  reduceTicketCount: (amount: number, ticketId: string) => Promise<boolean>
+  updateTicketCount: (amount: number, ticketId: string) => Promise<boolean>
 
 }
 
@@ -78,30 +78,27 @@ EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
 EventSchema.methods.canBuyTicketAmount = function (amount: number, ticketId: string): boolean {
   const ticket: EventTicket = this.findTicket(ticketId);
 
-  console.log('Available: ', ticket.availableTickets, '-- Required: ', amount);
+  console.log('Available: ', (ticket.nLimit - ticket.nSold), '-- Required: ', amount);
+
+  const available = ticket.nLimit - ticket.nSold;
 
   if (!ticket) {
-    console.log('ticket not found');
     return false;
   }
 
-  return ticket.availableTickets >= amount;
+  return available >= amount;
 }
 
-EventSchema.methods.reduceTicketCount = async function (reduceBy: number, ticketId: string,) {
-  console.log('reducing event ticket count');
+EventSchema.methods.updateTicketSoldCount = async function (amount: number, ticketId: string,) {
   const ticket = this.findTicket(ticketId);
-
-  console.log(ticket);
 
   const tickets = [...this.tickets];
 
-  ticket.availableTickets = ticket.availableTickets - reduceBy;
+  ticket.nSold = ticket.nSold + amount;
 
   const index = tickets.findIndex(data => data.id === ticketId);
 
   tickets[index] = ticket;
   await this.update({ tickets });
-  console.log('ticket count updated');
   return true;
 }

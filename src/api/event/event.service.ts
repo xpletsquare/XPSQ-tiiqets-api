@@ -70,8 +70,15 @@ export class EventService {
 
   async addEventTicket(details: CreateEventTicketDTO) {
     const ticket: EventTicket = {
-      ...details,
-      id: generateId()
+      id: generateId(),
+      nLimit: details.availableTickets,
+      nSold: 0,
+      name: details.name,
+      price: details.price,
+      eventId: details.eventId,
+      endSalesAt: details.endSalesAt,
+      maxPurchases: details.maxPossiblePurchases,
+      description: details.description
     };
 
     const event = await this.eventsRepository.findOne(ticket.eventId);
