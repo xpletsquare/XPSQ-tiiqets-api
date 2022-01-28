@@ -27,7 +27,8 @@ export class WalletService {
 
   @OnEvent(APP_EVENTS.UserActivated)
   async createWallet(payload: UserDTO) {
-
+    const wallet = await this.walletHelper.createWallet(payload.id);
+    return wallet;
   }
 
   async getUserWallet(userId: string) {
