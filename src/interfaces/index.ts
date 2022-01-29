@@ -13,6 +13,13 @@ export type UserWithResetPin = {
   resetPin: number
 }
 
+export interface IEventSchedule {
+  name: string
+  date: string
+  start: string
+  end: string
+}
+
 export type SendMailOptions = {
   sender?: string;
   subject: string;

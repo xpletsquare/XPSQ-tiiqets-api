@@ -1,4 +1,6 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsEnum, IsIn, IsNumber, IsOptional, IsString } from "class-validator";
+import { IEventSchedule } from "src/interfaces";
+import { EventTicket } from "../schemas/event-ticket.schema";
 
 
 export class CreateEventTicketDTO {
@@ -16,11 +18,11 @@ export class CreateEventTicketDTO {
   price: number
 
   @IsNumber()
-  availableTickets: number;
+  nLimit: number;
 
   @IsOptional()
   @IsNumber()
-  maxPossiblePurchases: number
+  maxPurchases: number
 
   @IsOptional()
   @IsNumber()
