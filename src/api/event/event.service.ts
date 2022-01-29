@@ -71,13 +71,13 @@ export class EventService {
   async addEventTicket(details: CreateEventTicketDTO) {
     const ticket: EventTicket = {
       id: generateId(),
-      nLimit: details.availableTickets,
+      nLimit: details.nLimit,
       nSold: 0,
       name: details.name,
       price: details.price,
       eventId: details.eventId,
-      endSalesAt: details.endSalesAt,
-      maxPurchases: details.maxPossiblePurchases,
+      endSalesAt: 0, // TODO: Calculate the time stamp of the associated schedule
+      maxPurchases: details.maxPurchases,
       description: details.description
     };
 
@@ -107,7 +107,6 @@ export class EventService {
 
     const { tickets: eventTickets, status } = event;
 
-
     if (status !== 'DRAFT') {
       throw new BadRequestException('Cannot update tickets for a Published Event');
     }
@@ -124,7 +123,6 @@ export class EventService {
     const { id, eventId, ...updateAbleFields } = ticketDetails;
 
     Object.keys(updateAbleFields).forEach(key => {
-      console.log(key, ticketDetails[key], details[key])
       ticketDetails[key] = details[key];
     })
 
