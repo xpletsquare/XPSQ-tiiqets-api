@@ -105,6 +105,12 @@ export class TicketPurchaseHelper {
 
     const labels = ticketSummary.labels || [];
 
+    const getDateForTicket = () => {
+      const ticketData = event.findTicket(ticketSummary.id);
+      const schedule = event.schedules.find(schedule => schedule.name === ticketData.schedule);
+      return schedule.date;
+    }
+
     const generatedTickets = [];
 
     for (let index = 0; index < ticketSummary.amountToPurchase; index++) {
@@ -120,7 +126,7 @@ export class TicketPurchaseHelper {
           title: event.title,
           image: event.image,
           venue: event.venue,
-          date: event.date
+          date: getDateForTicket()
         }
       };
 

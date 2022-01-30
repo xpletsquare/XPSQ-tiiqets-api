@@ -69,31 +69,55 @@ export class WalletHelpers {
       {
         $lookup: {
           from: 'bankdetails',
-          localField: "bankDetailsId",
-          foreignField: "id",
-          as: "bankInfo"
+          let: { bankDetailsId: "$bankDetailsId" },
+          as: "bankInfo",
+          pipeline: [
+            {
+              $match: {
+                id: "$$bankDetailsId"
+              },
+            },
+            {
+              $project: {
+                _id: 0
+              }
+            }
+          ]
         }
       },
       {
         $lookup: {
           from: 'users',
-          localField: "user",
-          foreignField: "id",
+          let: {
+            user: "$user"
+          },
           as: "userInfo",
+          pipeline: [
+            {
+              $match: {
+                id: "$$user"
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                hashedPassword: 0
+              }
+            }
+          ]
         }
       },
       { // ADD EVENT WALLETS THAT HAVENT BEEN PAID OUT
         $lookup: {
           from: 'eventwallet',
-          localField: "id",
-          foreignField: "event",
           as: "eventWallets",
           pipeline: [
             {
               $match: {
+                event: "$id",
                 paidOut: false
               }
-            }
+            },
           ]
         }
       }

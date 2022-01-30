@@ -24,11 +24,11 @@ export class UpdateEventTicketDTO {
 
   @IsOptional()
   @IsNumber()
-  availableTickets?: number;
+  nLimit?: number;
 
   @IsOptional()
   @IsNumber()
-  maxPossiblePurchases?: number
+  maxPurchases?: number
 
   @IsOptional()
   @IsNumber()

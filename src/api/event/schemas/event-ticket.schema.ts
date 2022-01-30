@@ -20,6 +20,8 @@ export class EventTicket {
 
   endSalesAt: number;
 
+  schedule: string // Uses the scehedule name
+
 }
 
 export class EventTicketPurchase {

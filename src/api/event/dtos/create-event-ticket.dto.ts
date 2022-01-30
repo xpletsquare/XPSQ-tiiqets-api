@@ -27,4 +27,7 @@ export class CreateEventTicketDTO {
   @IsOptional()
   @IsNumber()
   endSalesAt: number;
+
+  @IsString()
+  schedule: string;
 }

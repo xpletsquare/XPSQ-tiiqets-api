@@ -2,7 +2,9 @@
 
 import { CONFIG } from "src/config";
 import { customAlphabet } from 'nanoid'
-const nanoid = customAlphabet('1234567890ABCDEFGHIJKLMNPQRSTUV', 10)
+import { IEventSchedule } from "src/interfaces";
+const nanoid = customAlphabet('1234567890ABCDEFGHIJKLMNPQRSTUV', 10);
+import { format, compareAsc } from 'date-fns';
 
 const qrcodeReader = require('qrcode');
 const jwt = require('jsonwebtoken');
@@ -119,3 +121,13 @@ export const generatePaymentRef = () => {
 }
 
 export const generatePromoterCode = () => nanoid();
+
+export const getEventStartAndEndDate = (schedules: IEventSchedule[]): [Date, Date] => {
+  const dates = schedules.map(schedule => new Date(schedule.date));
+  const sortedDates = dates.sort(compareAsc);
+
+  const start = sortedDates[0];
+  const end = sortedDates[dates.length - 1];
+
+  return [start, end];
+}

@@ -31,22 +31,10 @@ export class CreateEventDTO {
   occurrence: "single" | "multiple" | ""
 
   @IsArray()
-  schedules: IEventSchedule[]
+  schedules: IEventSchedule[];
 
   @IsArray()
-  tickets: EventTicket[]
-
-  @ApiProperty()
-  @IsString()
-  date: string;
-
-  @ApiProperty()
-  @IsNumber()
-  startsAt: number;
-
-  @ApiProperty()
-  @IsNumber()
-  endsAt: number;
+  tickets: EventTicket[];
 
   @ApiProperty()
   @IsUrl({}, { message: 'please upload a valid landscape image' })

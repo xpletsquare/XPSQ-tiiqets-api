@@ -11,6 +11,11 @@ export enum EventStatus {
   CANCELED = 'CANCELED',
 }
 
+interface EventImage {
+  landscape: string
+  portrait: string
+}
+
 @Schema({ timestamps: true })
 export class Event extends Document {
   @Prop({ required: true, index: true })
@@ -20,7 +25,10 @@ export class Event extends Document {
   title: string;
 
   @Prop({ required: true })
-  location: string;
+  venue: string;
+
+  @Prop({ required: false })
+  address: string;
 
   @Prop({ required: true, type: Date })
   startDate: Date | string;
@@ -34,11 +42,8 @@ export class Event extends Document {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  image: {
-    landscape: string
-    portrait: string
-  };
+  @Prop({ required: true, type: Object })
+  image: EventImage
 
   @Prop({ default: [], type: [Object] })
   tickets: EventTicket[];
@@ -69,8 +74,8 @@ export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.methods.toDto = function () {
-  const { id, title, location, date, status, startsAt, endsAt, description, image, tickets, category, tags, author } = this as any;
-  return { id, title, location, date, status, startsAt, endsAt, description, image, tickets, category, tags, author };
+  const { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author } = this as any;
+  return { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author };
 }
 
 EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
