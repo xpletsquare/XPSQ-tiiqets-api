@@ -14,7 +14,6 @@ export const generateUserActivationEmail = (user: Partial<UserDTO>, activationPi
   
   <body style="padding: 10vh 10vw; background-color: rgb(243, 243, 243);">
     <main style="max-width: 700px; margin: 1em auto; background-color: white; box-shadow: 0px 0px 20px  lightgray; padding: 3em;">
-      <img src="https://res.cloudinary.com/dk07kf3yl/image/upload/v1640155875/temp/Fastes_way_to_puchase_tickets_ei12v2.png" alt="" style="width: 100%; border-radius: 3px; height: auto; object-fit: contain;">
   
       <div class="greeting" style="margin: 1em 0;">Hi <span style="text-transform: capitalize">${user.firstName}</span> </div>
   
@@ -30,7 +29,9 @@ export const generateUserActivationEmail = (user: Partial<UserDTO>, activationPi
           support@xpsq.com.
         </div>
   
-        <div style="margin: 1em 0;">XPSQ Nigeria</div>
+        <div style="margin: 1em 0;">
+          &copy; 2021 Uzu Tickets
+        </div>
       </div>
     </main>
   </body>

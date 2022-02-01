@@ -36,6 +36,9 @@ export class CreateEventDTO {
   @IsArray()
   tickets: EventTicket[];
 
+  @IsArray()
+  tags: string[];
+
   @ApiProperty()
   @IsUrl({}, { message: 'please upload a valid landscape image' })
   @IsOptional()

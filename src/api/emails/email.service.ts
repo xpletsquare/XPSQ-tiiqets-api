@@ -49,7 +49,7 @@ export class EmailService {
       message: email,
       recipients: ['kenovienadu@gmail.com'],
       isHtml: true,
-      subject: 'Login Alert - XPSQ',
+      subject: 'Login Alert - Uzu Tickets',
       sender: 'Uzu Tickets <alerts@uzutickets.com>'
     })
 

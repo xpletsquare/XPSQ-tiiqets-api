@@ -19,7 +19,7 @@ export class EventRepository {
     const tickets = dto.tickets.map(ticket => {
       return {
         ...ticket,
-        id: generateId(),
+        id: generateId(), 
         nSold: 0
       }
     })
@@ -32,20 +32,39 @@ export class EventRepository {
       startDate: firstDate,
       endDate: lastDate,
       image: {
-        landscape: dto.landscapeImage,
-        portrait: dto.portraitImage
+        landscape: dto.landscapeImage || '',
+        portrait: dto.portraitImage || ''
       },
       category: dto.category,
       author: dto.author,
       schedules: dto.schedules,
-      tickets
+      tickets,
+      tags: dto.tags
     };
 
-    console.log({ eventData })
-
     const event = await this.eventModel.create(eventData);
-
     return event || null;
+  }
+
+  async updateEvent(eventId: string, updates: Partial<Event> = {}): Promise<boolean> {
+    const currentEventState = await this.findOne(eventId);
+
+    if(!currentEventState){
+      return false;
+    }
+
+    const [ firstDate, lastDate ] = getEventStartAndEndDate(updates?.schedules || currentEventState.schedules); // Calculate Start and End Date based on schedules
+
+    const { id, author, status, ...restOfUpdate } = updates; // schedules and tickets are to be modified separately;
+    
+    const data = await this.eventModel.updateOne(
+      { id: eventId }, {
+        ...restOfUpdate,
+        startDate: firstDate,
+        endDate: lastDate,
+      });
+
+    return data?.modifiedCount >= 1;
   }
 
   async findOne(
@@ -72,13 +91,6 @@ export class EventRepository {
       .exec();
 
     return events;
-  }
-
-  async updateEvent(eventId: string, updates: Partial<Event> = {}): Promise<boolean> {
-    const { id, author, ...restOfUpdate } = updates;
-    const data = await this.eventModel.updateMany({ id: eventId }, restOfUpdate);
-
-    return data?.modifiedCount >= 1;
   }
 
   async deleteEvent(id: string): Promise<boolean> {

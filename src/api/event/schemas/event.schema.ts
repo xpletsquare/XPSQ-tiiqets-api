@@ -1,6 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IEventSchedule } from 'src/interfaces';
+import { Timestamp } from 'src/utilities';
 import { EventTicket } from './event-ticket.schema';
 
 // export enum EventStatus = 'DRAFT' | 'ACTIVE' | 'PASSED' | 'INACTIVE' | 'CANCELED' | string;
@@ -30,11 +31,11 @@ export class Event extends Document {
   @Prop({ required: false })
   address: string;
 
-  @Prop({ required: true, type: Date })
-  startDate: Date | string;
+  @Prop({ required: true })
+  startDate: Timestamp;
 
-  @Prop({ required: true, type: Date })
-  endDate: Date | string;
+  @Prop({ required: true })
+  endDate: Timestamp;
 
   @Prop({ required: true, default: [], type: [Object] })
   schedules: IEventSchedule[];
@@ -74,8 +75,8 @@ export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.methods.toDto = function () {
-  const { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author } = this as any;
-  return { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author };
+  const { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author, venue } = this as any;
+  return { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author, venue };
 }
 
 EventSchema.methods.findTicket = function (ticketId: string): EventTicket {

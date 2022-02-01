@@ -68,9 +68,8 @@ export class EventController {
   @UseGuards(LoggedInGuard)
   @Put(':id')
   async updateEvent(@Param('id') id: string, @Body() body: Partial<UpdateEventTicketDTO & Event>) {
-    // const updatedEvent = await this.eventService.updateEvent(id, body);
-    // return new SuccessResponse('event updated successfully', updatedEvent);
-    throw new BadRequestException('Sorry, an error occurred');
+    const updatedEvent = await this.eventService.updateEvent(id, body);
+    return new SuccessResponse('event updated successfully', updatedEvent);
   }
 
   @UseGuards(LoggedInGuard)
