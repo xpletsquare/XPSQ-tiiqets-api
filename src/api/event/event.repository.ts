@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Event, EventDocument } from './schemas/event.schema';
 import { CreateEventDTO } from './dtos/create-event.dto';
-import { generateId } from 'src/utilities';
+import { generateId, getEventStartAndEndDate } from 'src/utilities';
 
 
 @Injectable()
@@ -14,23 +14,34 @@ export class EventRepository {
 
 
   async createEvent(dto: CreateEventDTO) {
-    const eventData: CreateEventDTO & { id: string } = {
+    const [firstDate, lastDate] = getEventStartAndEndDate(dto.schedules); // Calculate Start and End Date based on schedules
+
+    const tickets = dto.tickets.map(ticket => {
+      return {
+        ...ticket,
+        id: generateId(),
+        nSold: 0
+      }
+    })
+
+    const eventData: Partial<Event> & { id: string } = {
       id: generateId(),
       title: dto.title,
       venue: dto.venue,
-      date: dto.date,
       description: dto.description,
-      startsAt: dto.startsAt,
-      endsAt: dto.endsAt,
-      image: dto.image,
+      startDate: firstDate,
+      endDate: lastDate,
+      image: {
+        landscape: dto.landscapeImage,
+        portrait: dto.portraitImage
+      },
       category: dto.category,
       author: dto.author,
-      // TODO: Implement Location Tracking
-      // location: {
-      //   longitude: dto.longitude,
-      //   latitude: dto.latitude,
-      // }
+      schedules: dto.schedules,
+      tickets
     };
+
+    console.log({ eventData })
 
     const event = await this.eventModel.create(eventData);
 

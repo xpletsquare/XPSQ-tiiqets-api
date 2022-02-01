@@ -1,5 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { IEventSchedule } from 'src/interfaces';
 import { EventTicket } from './event-ticket.schema';
 
 // export enum EventStatus = 'DRAFT' | 'ACTIVE' | 'PASSED' | 'INACTIVE' | 'CANCELED' | string;
@@ -8,6 +9,11 @@ export enum EventStatus {
   ACTIVE = 'ACTIVE',
   PASSED = 'INACTIVE',
   CANCELED = 'CANCELED',
+}
+
+interface EventImage {
+  landscape: string
+  portrait: string
 }
 
 @Schema({ timestamps: true })
@@ -21,20 +27,23 @@ export class Event extends Document {
   @Prop({ required: true })
   venue: string;
 
+  @Prop({ required: false })
+  address: string;
+
   @Prop({ required: true, type: Date })
-  date: Date | string;
+  startDate: Date | string;
 
-  @Prop()
-  startsAt: number; // Timestamp
+  @Prop({ required: true, type: Date })
+  endDate: Date | string;
 
-  @Prop()
-  endsAt: number; // Timestamp
+  @Prop({ required: true, default: [], type: [Object] })
+  schedules: IEventSchedule[];
 
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  image: string;
+  @Prop({ required: true, type: Object })
+  image: EventImage
 
   @Prop({ default: [], type: [Object] })
   tickets: EventTicket[];
@@ -65,8 +74,8 @@ export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.methods.toDto = function () {
-  const { id, title, venue, date, status, startsAt, endsAt, description, image, tickets, category, tags, author } = this as any;
-  return { id, title, venue, date, status, startsAt, endsAt, description, image, tickets, category, tags, author };
+  const { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author } = this as any;
+  return { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author };
 }
 
 EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
@@ -77,8 +86,6 @@ EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
 
 EventSchema.methods.canBuyTicketAmount = function (amount: number, ticketId: string): boolean {
   const ticket: EventTicket = this.findTicket(ticketId);
-
-  console.log('Available: ', (ticket.nLimit - ticket.nSold), '-- Required: ', amount);
 
   const available = ticket.nLimit - ticket.nSold;
 

@@ -11,9 +11,8 @@ export class LoggedInGuard implements CanActivate {
     if (authorizationToken) {
       const token = authorizationToken.split(' ')[1];
       const payload = await verifyAndDecodeJWTToken(token);
+      
       if (!payload || !payload.id) return false; //throw new UnauthorizedException;
-
-      console.log(payload);
       return payload && true;
     }
 

@@ -6,7 +6,7 @@ import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
 import { EventRepository } from './event.repository';
 import { EventTicket } from './schemas/event-ticket.schema';
 import { Event } from './schemas/event.schema'
-
+ 
 @Injectable()
 export class EventService {
   constructor(
@@ -40,6 +40,14 @@ export class EventService {
   }
 
   async createEvent(details: CreateEventDTO) {
+    if(!details.schedules.length){
+      throw new BadRequestException('Please add one or more schedules');
+    }
+
+    if(!details.tickets.length){
+      throw new BadRequestException('Please add one or more tickets for your event');
+    }
+
     const event = await this.eventsRepository.createEvent(details);
 
     if (!event) {
@@ -71,14 +79,15 @@ export class EventService {
   async addEventTicket(details: CreateEventTicketDTO) {
     const ticket: EventTicket = {
       id: generateId(),
-      nLimit: details.availableTickets,
+      nLimit: details.nLimit,
       nSold: 0,
       name: details.name,
       price: details.price,
       eventId: details.eventId,
-      endSalesAt: details.endSalesAt,
-      maxPurchases: details.maxPossiblePurchases,
-      description: details.description
+      endSalesAt: 0, // TODO: Calculate the time stamp of the associated schedule
+      maxPurchases: details.maxPurchases,
+      description: details.description,
+      schedule: details.schedule
     };
 
     const event = await this.eventsRepository.findOne(ticket.eventId);
@@ -91,7 +100,7 @@ export class EventService {
     const updated = await this.eventsRepository.updateEvent(event.id, { tickets: event.tickets });
 
     if (!updated) {
-      throw new InternalServerErrorException('Sorry, unable to add ticket at the moment.');
+      throw new BadRequestException('Sorry, unable to add ticket at the moment.');
     }
 
     return true;
@@ -106,7 +115,6 @@ export class EventService {
     }
 
     const { tickets: eventTickets, status } = event;
-
 
     if (status !== 'DRAFT') {
       throw new BadRequestException('Cannot update tickets for a Published Event');
@@ -124,7 +132,6 @@ export class EventService {
     const { id, eventId, ...updateAbleFields } = ticketDetails;
 
     Object.keys(updateAbleFields).forEach(key => {
-      console.log(key, ticketDetails[key], details[key])
       ticketDetails[key] = details[key];
     })
 
