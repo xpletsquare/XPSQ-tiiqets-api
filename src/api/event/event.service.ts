@@ -5,7 +5,7 @@ import { CreateEventDTO } from './dtos/create-event.dto';
 import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
 import { EventRepository } from './event.repository';
 import { EventTicket } from './schemas/event-ticket.schema';
-import { Event } from './schemas/event.schema'
+import { Event, EventStatus } from './schemas/event.schema'
  
 @Injectable()
 export class EventService {
@@ -61,11 +61,21 @@ export class EventService {
     const event = await this.eventsRepository.findOne(id);
     if (!event) throw new BadRequestException('Event not found');
 
+    if(event.status !== EventStatus.DRAFT){
+      throw new BadRequestException('Sorry, this event has been published and cannot be updated any longer.');
+    }
+
     const isUpdated = await this.eventsRepository.updateEvent(id, updates as Partial<Event>);
     if (!isUpdated) throw new BadRequestException('Unable to update event');
 
     const updatedEvent = await this.eventsRepository.findOne(id);
     return updatedEvent.toDto();
+  }
+
+  async changeEventStatus(id: string, status: EventStatus){
+    const updated = await this.eventsRepository.updateEventStatus(id, status);
+
+    if(!updated) throw new BadRequestException('Unable to update event');
   }
 
   async deleteEvent(id: string) {

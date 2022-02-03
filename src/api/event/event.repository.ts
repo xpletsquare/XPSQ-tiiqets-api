@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { Event, EventDocument } from './schemas/event.schema';
+import { Event, EventDocument, EventStatus } from './schemas/event.schema';
 import { CreateEventDTO } from './dtos/create-event.dto';
 import { generateId, getEventStartAndEndDate } from 'src/utilities';
 
@@ -63,6 +63,18 @@ export class EventRepository {
         startDate: firstDate,
         endDate: lastDate,
       });
+
+    return data?.modifiedCount >= 1;
+  }
+
+  async updateEventStatus(eventId: string, status: EventStatus){
+    const currentEventState = await this.findOne(eventId);
+
+    if(!currentEventState){
+      return false;
+    }
+
+    const data = await this.eventModel.updateOne({ id: eventId }, { status });
 
     return data?.modifiedCount >= 1;
   }
