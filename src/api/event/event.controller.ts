@@ -18,6 +18,7 @@ import { CreateEventDTO } from './dtos/create-event.dto';
 import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
 import { EventRepository } from './event.repository';
 import { EventService } from './event.service';
+import { Event } from './schemas/event.schema';
 
 @ApiTags('Events')
 @Controller('events')
@@ -54,7 +55,6 @@ export class EventController {
   })
   @Get('mine/:userId')
   async getMyEvents(@Param('userId') userId: string, @Query() query: any) {
-    console.log('get my events running');
     const events = await this.repository.findEvents({ author: userId }, query.limit, query.skip);
     return new SuccessResponse('success', events.map(event => event.toDto()));
   }
@@ -68,9 +68,15 @@ export class EventController {
   @UseGuards(LoggedInGuard)
   @Put(':id')
   async updateEvent(@Param('id') id: string, @Body() body: Partial<UpdateEventTicketDTO & Event>) {
-    // const updatedEvent = await this.eventService.updateEvent(id, body);
-    // return new SuccessResponse('event updated successfully', updatedEvent);
-    throw new BadRequestException('Sorry, an error occurred');
+    const updatedEvent = await this.eventService.updateEvent(id, body);
+    return new SuccessResponse('event updated successfully', updatedEvent);
+  }
+
+  @UseGuards(LoggedInGuard)
+  @Put(':id/status')
+  async changeEventStatus(@Param('id') id: string, @Body() body: Pick<Event, 'status'>) {
+    const updatedEvent = await this.eventService.changeEventStatus(id, body.status);
+    return new SuccessResponse('event updated successfully', updatedEvent);
   }
 
   @UseGuards(LoggedInGuard)

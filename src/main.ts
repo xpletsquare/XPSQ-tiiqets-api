@@ -1,8 +1,10 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { CONFIG } from './config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+const logger = new Logger
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,7 +23,7 @@ async function bootstrap() {
   app.enableCors();
 
   await app.listen(CONFIG.PORT);
-  console.log(`APPLICATION STARTED ON PORT ${CONFIG.PORT}`)
+  logger.log(`APPLICATION STARTED ON PORT ${CONFIG.PORT}`)
 }
 
 bootstrap();

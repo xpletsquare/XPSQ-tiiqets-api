@@ -50,7 +50,9 @@ export const generateTicketEmail = async (ticketDetails: TicketPurchased) => {
           <div style="margin: 1em 0;">This email was intended for ${ticketDetails.userEmail}. If you received this by mistake or have any questions, please reach out to us on
           support@xpsq.com.</div>
     
-          <div style="margin: 1em 0;">Uzu Tickets Nigeria</div>
+          <div style="margin: 1em 0;">
+            &copy; 2021 Uzu Tickets
+          </div>
         </div>
       </main>
     </body>

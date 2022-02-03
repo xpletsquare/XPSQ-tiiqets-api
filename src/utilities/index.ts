@@ -12,6 +12,8 @@ const bcrypt = require('bcrypt');
 const fs = require('graceful-fs');
 const { v4: uuidv4 } = require('uuid');
 
+export type Timestamp = number;
+
 export const hashPassword = (plainPassword: string) => {
   const hash = bcrypt.hashSync(plainPassword, 11);
   return hash;
@@ -122,12 +124,14 @@ export const generatePaymentRef = () => {
 
 export const generatePromoterCode = () => nanoid();
 
-export const getEventStartAndEndDate = (schedules: IEventSchedule[]): [Date, Date] => {
-  const dates = schedules.map(schedule => new Date(schedule.date));
+export const getEventStartAndEndDate = (schedules: IEventSchedule[]): [Timestamp, Timestamp] => {
+  const dates = schedules.map(schedule => new Date(schedule.date).getTime() );
   const sortedDates = dates.sort(compareAsc);
 
   const start = sortedDates[0];
   const end = sortedDates[dates.length - 1];
+
+  console.log({start, end});
 
   return [start, end];
 }

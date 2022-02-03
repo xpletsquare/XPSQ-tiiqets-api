@@ -32,7 +32,6 @@ export const generatePurchaseReceiptEmail = (eventName: string, payload: Partial
 
   <body style="padding: 10vh 10vw; background-color: rgb(243, 243, 243); color: #1f1f1f; font-size: 1.1em;">
     <main style="max-width: 700px; margin: 1em auto; background-color: white; box-shadow: 0px 0px 20px  lightgray; padding: 3em;">
-      <!-- <img src="https://res.cloudinary.com/dk07kf3yl/image/upload/v1640155875/temp/Fastes_way_to_puchase_tickets_ei12v2.png" alt=""> -->
   
       <div class="message" style="margin: 1em 0;">Thank you for purchasing tickets from Uzu Tickets.</div>
   
