@@ -1,17 +1,15 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { generateId } from 'src/utilities';
 import { CreateEventTicketDTO } from './dtos/create-event-ticket.dto';
 import { CreateEventDTO } from './dtos/create-event.dto';
 import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
 import { EventRepository } from './event.repository';
 import { EventTicket } from './schemas/event-ticket.schema';
-import { Event, EventStatus } from './schemas/event.schema'
- 
+import { Event, EventStatus } from './schemas/event.schema';
+
 @Injectable()
 export class EventService {
-  constructor(
-    private eventsRepository: EventRepository
-  ) { }
+  constructor(private eventsRepository: EventRepository) {}
 
   async getEvent(id: string) {
     const event = await this.eventsRepository.findOne(id);
@@ -40,11 +38,11 @@ export class EventService {
   }
 
   async createEvent(details: CreateEventDTO) {
-    if(!details.schedules.length){
+    if (!details.schedules.length) {
       throw new BadRequestException('Please add one or more schedules');
     }
 
-    if(!details.tickets.length){
+    if (!details.tickets.length) {
       throw new BadRequestException('Please add one or more tickets for your event');
     }
 
@@ -54,14 +52,14 @@ export class EventService {
       throw new BadRequestException('Sorry, we cannot create this event. Please try again later');
     }
 
-    return event.toDto()
+    return event.toDto();
   }
 
   async updateEvent(id: string, updates: Partial<UpdateEventTicketDTO & Event>) {
     const event = await this.eventsRepository.findOne(id);
     if (!event) throw new BadRequestException('Event not found');
 
-    if(event.status !== EventStatus.DRAFT){
+    if (event.status !== EventStatus.DRAFT) {
       throw new BadRequestException('Sorry, this event has been published and cannot be updated any longer.');
     }
 
@@ -72,10 +70,10 @@ export class EventService {
     return updatedEvent.toDto();
   }
 
-  async changeEventStatus(id: string, status: EventStatus){
+  async changeEventStatus(id: string, status: EventStatus) {
     const updated = await this.eventsRepository.updateEventStatus(id, status);
 
-    if(!updated) throw new BadRequestException('Unable to update event');
+    if (!updated) throw new BadRequestException('Unable to update event');
   }
 
   async deleteEvent(id: string) {
@@ -97,7 +95,7 @@ export class EventService {
       endSalesAt: 0, // TODO: Calculate the time stamp of the associated schedule
       maxPurchases: details.maxPurchases,
       description: details.description,
-      schedule: details.schedule
+      schedule: details.schedule,
     };
 
     const event = await this.eventsRepository.findOne(ticket.eventId);
@@ -116,7 +114,6 @@ export class EventService {
     return true;
   }
 
-
   async updateEventTicket(details: UpdateEventTicketDTO) {
     const event = await this.eventsRepository.findOne(details.eventId);
 
@@ -130,23 +127,22 @@ export class EventService {
       throw new BadRequestException('Cannot update tickets for a Published Event');
     }
 
-
-    const ticketIndex = eventTickets.findIndex(ticket => ticket.id === details.id);
+    const ticketIndex = eventTickets.findIndex((ticket) => ticket.id === details.id);
 
     if (ticketIndex === -1) {
       throw new BadRequestException('Invalid Ticket Details');
     }
 
-    const ticketDetails = eventTickets.find(ticket => ticket.id === details.id);
+    const ticketDetails = eventTickets.find((ticket) => ticket.id === details.id);
 
     const { id, eventId, ...updateAbleFields } = ticketDetails;
 
-    Object.keys(updateAbleFields).forEach(key => {
+    Object.keys(updateAbleFields).forEach((key) => {
       ticketDetails[key] = details[key];
-    })
+    });
 
     eventTickets[ticketIndex] = ticketDetails;
-    const updated = await this.eventsRepository.updateEvent(event.id, { tickets: eventTickets })
+    const updated = await this.eventsRepository.updateEvent(event.id, { tickets: eventTickets });
 
     if (!updated) {
       throw new BadRequestException('Failed to update event. Please try again later');
@@ -154,5 +150,4 @@ export class EventService {
 
     return ticketDetails;
   }
-
 }

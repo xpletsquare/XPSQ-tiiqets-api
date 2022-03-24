@@ -1,12 +1,8 @@
-
-
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
-
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class EventWallet {
-
   @Prop()
   id: string;
 
@@ -18,7 +14,6 @@ export class EventWallet {
 
   @Prop({ default: false })
   paidOut: boolean;
-
 }
 
 export type EventWalletDocument = Document & EventWallet;

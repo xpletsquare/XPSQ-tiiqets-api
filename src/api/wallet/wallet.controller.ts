@@ -1,13 +1,10 @@
-import { Controller, Get, Param } from "@nestjs/common";
-import { SuccessResponse } from "src/utilities/successMessage";
-import { WalletService } from "./wallet.service";
-
+import { Controller, Get, Param } from '@nestjs/common';
+import { SuccessResponse } from 'src/utilities/successMessage';
+import { WalletService } from './wallet.service';
 
 @Controller('wallet')
 export class WalletController {
-  constructor(
-    private walletService: WalletService
-  ) { }
+  constructor(private walletService: WalletService) {}
 
   @Get()
   async getWallets() {

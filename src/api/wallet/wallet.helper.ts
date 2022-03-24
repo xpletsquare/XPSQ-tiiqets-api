@@ -1,18 +1,16 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { APP_EVENTS } from "src/events";
-import { generateId } from "src/utilities";
-import { BankDetails, BankDetailDocument } from "./schemas/bankDetails.schema";
-import { EventWallet, EventWalletDocument } from "./schemas/event-wallet.schema";
-import { Wallet, WalletDocument } from "./schemas/wallet.schema";
-
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { APP_EVENTS } from 'src/events';
+import { generateId } from 'src/utilities';
+import { BankDetails, BankDetailDocument } from './schemas/bankDetails.schema';
+import { EventWallet, EventWalletDocument } from './schemas/event-wallet.schema';
+import { Wallet, WalletDocument } from './schemas/wallet.schema';
 
 @Injectable()
 export class WalletHelpers {
-
-  private readonly logger = new Logger;
+  private readonly logger = new Logger();
 
   constructor(
     @InjectModel(Wallet.name)
@@ -22,12 +20,12 @@ export class WalletHelpers {
     private eventWalletModel: Model<EventWalletDocument>,
 
     @InjectModel(BankDetails.name)
-    private bankWalletDetails: Model<BankDetailDocument>
-  ) { }
+    private bankWalletDetails: Model<BankDetailDocument>,
+  ) {}
 
   @OnEvent(APP_EVENTS.UserActivated)
   onUserActivated() {
-
+    //
   }
 
   async createWallet(userid: string) {
@@ -40,17 +38,17 @@ export class WalletHelpers {
     const bankDetails = await this.bankWalletDetails.create({
       id: generateId(),
       user: userid,
-    })
+    });
 
     const wallet = await this.walletModel.create({
       id: generateId(),
       user: userid,
       balance: 0,
-      bankDetailsId: bankDetails.id
-    })
+      bankDetailsId: bankDetails.id,
+    });
 
     if (!wallet || !bankDetails) {
-      throw new NotFoundException('')
+      throw new NotFoundException('');
     }
 
     this.logger.log(`Wallet (${wallet.id}) created for user (${wallet.user})`);
@@ -59,72 +57,82 @@ export class WalletHelpers {
   }
 
   async getUserWallet(userId: string) {
-
-    const wallets = await this.walletModel.aggregate([
-      {
-        $match: {
-          user: userId
-        }
-      },
-      {
-        $lookup: {
-          from: 'bankdetails',
-          let: { bankDetailsId: "$bankDetailsId" },
-          as: "bankInfo",
-          pipeline: [
-            {
-              $match: {
-                id: "$$bankDetailsId"
-              },
-            },
-            {
-              $project: {
-                _id: 0
-              }
-            }
-          ]
-        }
-      },
-      {
-        $lookup: {
-          from: 'users',
-          let: {
-            user: "$user"
+    const wallets = await this.walletModel
+      .aggregate([
+        {
+          $match: {
+            user: userId,
           },
-          as: "userInfo",
-          pipeline: [
-            {
-              $match: {
-                id: "$$user"
-              }
+        },
+        {
+          $lookup: {
+            from: 'bankdetails',
+            let: { bankDetailsId: '$bankDetailsId' },
+            as: 'bankInfo',
+            pipeline: [
+              {
+                $match: {
+                  id: '$$bankDetailsId',
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            let: {
+              user: '$user',
             },
-            {
-              $project: {
-                _id: 1,
-                hashedPassword: 0
-              }
-            }
-          ]
-        }
-      },
-      { // ADD EVENT WALLETS THAT HAVENT BEEN PAID OUT
-        $lookup: {
-          from: 'eventwallet',
-          as: "eventWallets",
-          pipeline: [
-            {
-              $match: {
-                event: "$id",
-                paidOut: false
-              }
-            },
-          ]
-        }
-      }
-    ]).unwind("bankInfo", "userInfo").exec();
+            as: 'userInfo',
+            pipeline: [
+              {
+                $match: {
+                  id: '$$user',
+                },
+              },
+              {
+                $project: {
+                  _id: 1,
+                  hashedPassword: 0,
+                },
+              },
+            ],
+          },
+        },
+        // {
+        //   // ADD EVENT WALLETS THAT HAVENT BEEN PAID OUT
+        //   $lookup: {
+        //     from: 'eventwallet',
+        //     as: 'eventWallets',
+        //     pipeline: [
+        //       {
+        //         $match: {
+        //           event: '$id',
+        //           paidOut: false,
+        //         },
+        //       },
+        //     ],
+        //   },
+        // },
+      ])
+      // .unwind('bankInfo', 'userInfo')
+      .limit(1)
+      .exec();
 
     const userWallet = wallets[0];
 
     return userWallet;
+  }
+
+  async getUserEventsNotPaidOut(userid: string) {
+    // const events = await this.eventWalletModel.find({
+    //
+    // })
   }
 }
