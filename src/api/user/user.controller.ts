@@ -1,33 +1,25 @@
-import {
-  Body,
-  CacheTTL,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from "@nestjs/common";
-import { ApiOkResponse, ApiProduces, ApiTags } from "@nestjs/swagger";
-import { getQRCode } from "src/utilities";
-import { SuccessResponse } from "src/utilities/successMessage";
-import { AdminGuard } from "../authentication/guards/admin.guard";
-import { SingleUserResponse, UserListResponse } from "./responses";
-import { UserService } from "./user.service";
+import { Body, CacheTTL, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
+import { getQRCode } from 'src/utilities';
+import { SuccessResponse } from 'src/utilities/successMessage';
+import { AdminGuard } from '../authentication/guards/admin.guard';
+import { UpdateUserDTO } from './dtos/updateUser.dto';
+import { SingleUserResponse, UserListResponse } from './responses';
+import { UserService } from './user.service';
 
-@ApiTags("User")
-@Controller("users")
+@ApiTags('User')
+@Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   readonly responses = {
-    success: "success",
-    registrationSuccess: "user registeration successful",
-    userFound: "user data retrieved",
+    success: 'success',
+    registrationSuccess: 'user registeration successful',
+    userFound: 'user data retrieved',
   };
 
   @ApiOkResponse({
-    description: "Users Retrieved",
+    description: 'Users Retrieved',
     type: UserListResponse,
   })
   @UseGuards(AdminGuard)
@@ -48,8 +40,10 @@ export class UserController {
     return new SuccessResponse(this.responses.userFound, userInfo);
   }
 
-  @Put(":id")
-  async updateUserInfo() {
-    return new SuccessResponse("user details updated", {});
+  @Put(':id')
+  async updateUserInfo(@Param('id') id: string, @Body() body: UpdateUserDTO) {
+    const updatedUser = await this.userService.updateUserInfo(id, body);
+
+    return new SuccessResponse('user details updated', updatedUser);
   }
 }

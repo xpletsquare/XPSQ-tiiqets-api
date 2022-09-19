@@ -1,32 +1,24 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from "@nestjs/common";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { FilterQuery } from "mongoose";
-import { APP_EVENTS } from "src/events";
-import { UserDTO, UserWithActivationPin } from "src/interfaces";
-import {
-  createJWTWithPayload,
-  generateId,
-  generatePin,
-  generatePromoterCode,
-  hashPassword,
-} from "src/utilities";
-import { CacheService } from "../common/providers/cache.service";
-import { CreateTempUserDTO } from "./dtos/createTempUser.dto";
-import { CreateUserDTO } from "./dtos/createUser.dto";
-import { UpdateUserDTO } from "./dtos/updateUser.dto";
-import { User, UserDocument } from "./schemas/user.schema";
-import { UserRepository } from "./user.repository";
+
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FilterQuery } from 'mongoose';
+import { APP_EVENTS } from 'src/events';
+import { UserDTO, UserWithActivationPin } from 'src/interfaces';
+import { createJWTWithPayload, generateId, generatePin, generatePromoterCode, hashPassword } from 'src/utilities';
+import { CacheService } from '../common/providers/cache.service';
+import { CreateTempUserDTO } from './dtos/createTempUser.dto';
+import { CreateUserDTO } from './dtos/createUser.dto';
+import { UpdateUserDTO } from './dtos/updateUser.dto';
+import { User, UserDocument } from './schemas/user.schema';
+import { UserRepository } from './user.repository';
+
 
 @Injectable()
 export class UserService {
   constructor(
     private userRepository: UserRepository,
     private eventEmitterClient: EventEmitter2,
-    private cacheService: CacheService
+    private cacheService: CacheService,
   ) {}
 
   private async getUser(
@@ -50,17 +42,32 @@ export class UserService {
     const user = await this.getUser(idOrEmail);
 
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     return user.toDto();
   }
 
   async updateUserInfo(identifier: string, updates: UpdateUserDTO) {
+    const query: any = {};
+
+    if (updates.email) query.email = updates.email;
+    if (updates.phone) query.phone = updates.phone;
+
     const userData = await this.getUser(identifier);
 
     if (!userData) {
       throw new NotFoundException("Invalid user");
+    }
+
+    if (Object.keys(query).length) {
+      const existingUser = await this.getUser('', {
+        $or: Object.keys(query).map((key) => ({ [key]: query[key] })),
+      });
+
+      if (existingUser) {
+        throw new BadRequestException('User already exists with email/phone');
+      }
     }
 
     return this.userRepository.updateUserDetails(userData.id, updates);
@@ -100,11 +107,8 @@ export class UserService {
   }
 
   async saveActivatedUser(dto: CreateUserDTO) {
-    const existingUser = await this.getUser("", {
-      $or: [
-        { email: dto.email.toLowerCase() },
-        { phone: dto.phone.toLowerCase() },
-      ],
+    const existingUser = await this.getUser('', {
+      $or: [{ email: dto.email.toLowerCase() }, { phone: dto.phone.toLowerCase() }],
     });
 
     if (existingUser) {
