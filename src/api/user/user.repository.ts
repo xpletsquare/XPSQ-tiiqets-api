@@ -4,12 +4,9 @@ import { FilterQuery, Model } from "mongoose";
 import { generateId } from "src/utilities";
 import { User, UserDocument } from "./schemas/user.schema";
 
-
 @Injectable()
 export class UserRepository {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) { }
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async createUser(dto: Partial<User>) {
     const userData: Partial<User> = {
@@ -27,22 +24,30 @@ export class UserRepository {
     return user || null;
   }
 
-  async findOne(identifier: string, filterQuery: FilterQuery<UserDocument> | null = null): Promise<UserDocument> {
-    const user = await this.userModel.findOne(filterQuery || {
-      $or: [
-        { id: identifier },
-        { email: identifier }
-      ]
-    }).exec();
+  async findOne(
+    identifier: string,
+    filterQuery: FilterQuery<UserDocument> | null = null
+  ): Promise<UserDocument> {
+    const user = await this.userModel
+      .findOne(
+        filterQuery || {
+          $or: [{ id: identifier }, { email: identifier }],
+        }
+      )
+      .exec();
 
     return user || null;
   }
 
-  async findUsers(filterQuery: FilterQuery<UserDocument> | null = null, limit = 100, skip = 0) {
+  async findUsers(
+    filterQuery: FilterQuery<UserDocument> | null = null,
+    limit = 100,
+    skip = 0
+  ) {
     const users = await this.userModel
       .find(filterQuery || {})
       .limit(limit)
-      .sort({ _id: 'asc' })
+      .sort({ _id: "asc" })
       .exec();
 
     return users;

@@ -1,11 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { generateId } from 'src/utilities';
-import { CreateEventTicketDTO } from './dtos/create-event-ticket.dto';
-import { CreateEventDTO } from './dtos/create-event.dto';
-import { UpdateEventTicketDTO } from './dtos/update-event-ticket.dto';
-import { EventRepository } from './event.repository';
-import { EventTicket } from './schemas/event-ticket.schema';
-import { Event, EventStatus } from './schemas/event.schema';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { generateId } from "src/utilities";
+import { CreateEventTicketDTO } from "./dtos/create-event-ticket.dto";
+import { CreateEventDTO } from "./dtos/create-event.dto";
+import { UpdateEventTicketDTO } from "./dtos/update-event-ticket.dto";
+import { EventRepository } from "./event.repository";
+import { EventTicket } from "./schemas/event-ticket.schema";
+import { Event, EventStatus } from "./schemas/event.schema";
 
 @Injectable()
 export class EventService {
@@ -15,7 +19,7 @@ export class EventService {
     const event = await this.eventsRepository.findOne(id);
 
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException("Event not found");
     }
 
     return event;
@@ -31,7 +35,7 @@ export class EventService {
     const ticketDetails = event.findTicket(ticketId);
 
     if (!ticketDetails) {
-      throw new BadRequestException('Invalid Ticket');
+      throw new BadRequestException("Invalid Ticket");
     }
 
     return ticketDetails;
@@ -39,32 +43,44 @@ export class EventService {
 
   async createEvent(details: CreateEventDTO) {
     if (!details.schedules.length) {
-      throw new BadRequestException('Please add one or more schedules');
+      throw new BadRequestException("Please add one or more schedules");
     }
 
     if (!details.tickets.length) {
-      throw new BadRequestException('Please add one or more tickets for your event');
+      throw new BadRequestException(
+        "Please add one or more tickets for your event"
+      );
     }
 
     const event = await this.eventsRepository.createEvent(details);
 
     if (!event) {
-      throw new BadRequestException('Sorry, we cannot create this event. Please try again later');
+      throw new BadRequestException(
+        "Sorry, we cannot create this event. Please try again later"
+      );
     }
 
     return event.toDto();
   }
 
-  async updateEvent(id: string, updates: Partial<UpdateEventTicketDTO & Event>) {
+  async updateEvent(
+    id: string,
+    updates: Partial<UpdateEventTicketDTO & Event>
+  ) {
     const event = await this.eventsRepository.findOne(id);
-    if (!event) throw new BadRequestException('Event not found');
+    if (!event) throw new BadRequestException("Event not found");
 
     if (event.status !== EventStatus.DRAFT) {
-      throw new BadRequestException('Sorry, this event has been published and cannot be updated any longer.');
+      throw new BadRequestException(
+        "Sorry, this event has been published and cannot be updated any longer."
+      );
     }
 
-    const isUpdated = await this.eventsRepository.updateEvent(id, updates as Partial<Event>);
-    if (!isUpdated) throw new BadRequestException('Unable to update event');
+    const isUpdated = await this.eventsRepository.updateEvent(
+      id,
+      updates as Partial<Event>
+    );
+    if (!isUpdated) throw new BadRequestException("Unable to update event");
 
     const updatedEvent = await this.eventsRepository.findOne(id);
     return updatedEvent.toDto();
@@ -73,15 +89,15 @@ export class EventService {
   async changeEventStatus(id: string, status: EventStatus) {
     const updated = await this.eventsRepository.updateEventStatus(id, status);
 
-    if (!updated) throw new BadRequestException('Unable to update event');
+    if (!updated) throw new BadRequestException("Unable to update event");
   }
 
   async deleteEvent(id: string) {
     const event = await this.eventsRepository.findOne(id);
-    if (!event) throw new BadRequestException('Event not found');
+    if (!event) throw new BadRequestException("Event not found");
 
     const isDeleted = await this.eventsRepository.updateEvent(id);
-    if (!isDeleted) throw new BadRequestException('Unable to delete event');
+    if (!isDeleted) throw new BadRequestException("Unable to delete event");
   }
 
   async addEventTicket(details: CreateEventTicketDTO) {
@@ -101,14 +117,18 @@ export class EventService {
     const event = await this.eventsRepository.findOne(ticket.eventId);
 
     if (!event) {
-      throw new BadRequestException('Invalid event');
+      throw new BadRequestException("Invalid event");
     }
 
     event.tickets = [...event.tickets, ticket];
-    const updated = await this.eventsRepository.updateEvent(event.id, { tickets: event.tickets });
+    const updated = await this.eventsRepository.updateEvent(event.id, {
+      tickets: event.tickets,
+    });
 
     if (!updated) {
-      throw new BadRequestException('Sorry, unable to add ticket at the moment.');
+      throw new BadRequestException(
+        "Sorry, unable to add ticket at the moment."
+      );
     }
 
     return true;
@@ -118,22 +138,28 @@ export class EventService {
     const event = await this.eventsRepository.findOne(details.eventId);
 
     if (!event) {
-      throw new BadRequestException('Invalid event');
+      throw new BadRequestException("Invalid event");
     }
 
     const { tickets: eventTickets, status } = event;
 
-    if (status !== 'DRAFT') {
-      throw new BadRequestException('Cannot update tickets for a Published Event');
+    if (status !== "DRAFT") {
+      throw new BadRequestException(
+        "Cannot update tickets for a Published Event"
+      );
     }
 
-    const ticketIndex = eventTickets.findIndex((ticket) => ticket.id === details.id);
+    const ticketIndex = eventTickets.findIndex(
+      (ticket) => ticket.id === details.id
+    );
 
     if (ticketIndex === -1) {
-      throw new BadRequestException('Invalid Ticket Details');
+      throw new BadRequestException("Invalid Ticket Details");
     }
 
-    const ticketDetails = eventTickets.find((ticket) => ticket.id === details.id);
+    const ticketDetails = eventTickets.find(
+      (ticket) => ticket.id === details.id
+    );
 
     const { id, eventId, ...updateAbleFields } = ticketDetails;
 
@@ -142,10 +168,14 @@ export class EventService {
     });
 
     eventTickets[ticketIndex] = ticketDetails;
-    const updated = await this.eventsRepository.updateEvent(event.id, { tickets: eventTickets });
+    const updated = await this.eventsRepository.updateEvent(event.id, {
+      tickets: eventTickets,
+    });
 
     if (!updated) {
-      throw new BadRequestException('Failed to update event. Please try again later');
+      throw new BadRequestException(
+        "Failed to update event. Please try again later"
+      );
     }
 
     return ticketDetails;

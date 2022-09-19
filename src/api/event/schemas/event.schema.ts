@@ -1,20 +1,20 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { IEventSchedule } from 'src/interfaces';
-import { Timestamp } from 'src/utilities';
-import { EventTicket } from './event-ticket.schema';
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
+import { IEventSchedule } from "src/interfaces";
+import { Timestamp } from "src/utilities";
+import { EventTicket } from "./event-ticket.schema";
 
 // export enum EventStatus = 'DRAFT' | 'ACTIVE' | 'PASSED' | 'INACTIVE' | 'CANCELED' | string;
 export enum EventStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  PASSED = 'INACTIVE',
-  CANCELED = 'CANCELED',
+  DRAFT = "DRAFT",
+  ACTIVE = "ACTIVE",
+  PASSED = "INACTIVE",
+  CANCELED = "CANCELED",
 }
 
 interface EventImage {
-  landscape: string
-  portrait: string
+  landscape: string;
+  portrait: string;
 }
 
 @Schema({ timestamps: true })
@@ -44,7 +44,7 @@ export class Event extends Document {
   description: string;
 
   @Prop({ required: true, type: Object })
-  image: EventImage
+  image: EventImage;
 
   @Prop({ default: [], type: [Object] })
   tickets: EventTicket[];
@@ -52,40 +52,79 @@ export class Event extends Document {
   @Prop()
   category: string;
 
-  @Prop({ enum: ['DRAFT', 'ACTIVE', 'PASSED', 'INACTIVE', 'CANCELED'], default: 'DRAFT' })
+  @Prop({
+    enum: ["DRAFT", "ACTIVE", "PASSED", "INACTIVE", "CANCELED"],
+    default: "DRAFT",
+  })
   status: EventStatus; // draft, active, passed, inactive, canceled
 
   @Prop()
-  tags: string[]
+  tags: string[];
 
   @Prop()
   author: string;
 
-  toDto: () => Partial<Event> 
+  toDto: () => Partial<Event>;
 
-  findTicket: (id: string) => EventTicket
+  findTicket: (id: string) => EventTicket;
 
-  canBuyTicketAmount: (amount: number, ticketId: string) => Promise<boolean>
+  canBuyTicketAmount: (amount: number, ticketId: string) => Promise<boolean>;
 
-  updateTicketCount: (amount: number, ticketId: string) => Promise<boolean>
-
+  updateTicketCount: (amount: number, ticketId: string) => Promise<boolean>;
 }
 
 export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.methods.toDto = function () {
-  const { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author, venue } = this as any;
-  return { id, title, location, date, status, startDate, endDate, description, image, tickets, schedules, category, tags, author, venue };
-}
+  const {
+    id,
+    title,
+    location,
+    date,
+    status,
+    startDate,
+    endDate,
+    description,
+    image,
+    tickets,
+    schedules,
+    category,
+    tags,
+    author,
+    venue,
+  } = this as any;
+  return {
+    id,
+    title,
+    location,
+    date,
+    status,
+    startDate,
+    endDate,
+    description,
+    image,
+    tickets,
+    schedules,
+    category,
+    tags,
+    author,
+    venue,
+  };
+};
 
 EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
   const { tickets } = this as any;
-  const ticket = tickets.find(ticket => [ticket.id, ticket.name].includes(ticketId));
+  const ticket = tickets.find((ticket) =>
+    [ticket.id, ticket.name].includes(ticketId)
+  );
   return ticket || null;
-}
+};
 
-EventSchema.methods.canBuyTicketAmount = function (amount: number, ticketId: string): boolean {
+EventSchema.methods.canBuyTicketAmount = function (
+  amount: number,
+  ticketId: string
+): boolean {
   const ticket: EventTicket = this.findTicket(ticketId);
 
   const available = ticket.nLimit - ticket.nSold;
@@ -95,18 +134,21 @@ EventSchema.methods.canBuyTicketAmount = function (amount: number, ticketId: str
   }
 
   return available >= amount;
-}
+};
 
-EventSchema.methods.updateTicketSoldCount = async function (amount: number, ticketId: string,) {
+EventSchema.methods.updateTicketSoldCount = async function (
+  amount: number,
+  ticketId: string
+) {
   const ticket = this.findTicket(ticketId);
 
   const tickets = [...this.tickets];
 
   ticket.nSold = ticket.nSold + amount;
 
-  const index = tickets.findIndex(data => data.id === ticketId);
+  const index = tickets.findIndex((data) => data.id === ticketId);
 
   tickets[index] = ticket;
   await this.update({ tickets });
   return true;
-}
+};

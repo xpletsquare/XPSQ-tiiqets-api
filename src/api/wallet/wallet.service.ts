@@ -1,13 +1,13 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { APP_EVENTS } from 'src/events';
-import { UserDTO } from 'src/interfaces';
-import { generateId } from 'src/utilities';
-import { BankDetailDocument, BankDetails } from './schemas/bankDetails.schema';
-import { Wallet, WalletDocument } from './schemas/wallet.schema';
-import { WalletHelpers } from './wallet.helper';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { APP_EVENTS } from "src/events";
+import { UserDTO } from "src/interfaces";
+import { generateId } from "src/utilities";
+import { BankDetailDocument, BankDetails } from "./schemas/bankDetails.schema";
+import { Wallet, WalletDocument } from "./schemas/wallet.schema";
+import { WalletHelpers } from "./wallet.helper";
 
 @Injectable()
 export class WalletService {
@@ -22,7 +22,7 @@ export class WalletService {
 
     private walletHelper: WalletHelpers,
 
-    private eventEmitter: EventEmitter2,
+    private eventEmitter: EventEmitter2
   ) {}
 
   @OnEvent(APP_EVENTS.UserActivated)
@@ -32,18 +32,25 @@ export class WalletService {
   }
 
   async getUserWallet(userId: string) {
-    let wallet = await this.walletHelper.getUserWallet(userId);
+    const walletResponse = await this.walletHelper.getUserWalletNew(userId);
 
-    if (!wallet) {
+    let newlyCreated = false;
+
+    if (!walletResponse.wallet) {
       // retry wallet creation
-      wallet = await this.walletHelper.createWallet(userId);
+      walletResponse.wallet = await this.walletHelper.createWallet(userId);
+      newlyCreated = Boolean(walletResponse.wallet);
     }
 
-    if (!wallet) {
-      throw new NotFoundException('No wallet found for user');
+    if (!walletResponse.wallet) {
+      throw new NotFoundException("No wallet found for user");
     }
 
-    return wallet;
+    if (newlyCreated) {
+      return this.getUserWallet(userId);
+    }
+
+    return walletResponse;
   }
 
   getSingleWithdrawalRequest() {

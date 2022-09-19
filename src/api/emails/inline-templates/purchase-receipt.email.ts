@@ -1,10 +1,12 @@
-import { EventTicketPurchase } from "src/api/event/schemas/event-ticket.schema"
+import { EventTicketPurchase } from "src/api/event/schemas/event-ticket.schema";
 import { TicketPurchase } from "src/api/purchase_ticket/schemas/ticket_purchase.schema";
 
-const generateTicketPurchaseCategoryRow = (purchaseSummary: EventTicketPurchase[]) => {
+const generateTicketPurchaseCategoryRow = (
+  purchaseSummary: EventTicketPurchase[]
+) => {
   let htmlContent = ``;
 
-  purchaseSummary.forEach(summary => {
+  purchaseSummary.forEach((summary) => {
     const priceForQuantity = summary.pricePerUnit * summary.amountToPurchase;
 
     htmlContent += `
@@ -12,14 +14,19 @@ const generateTicketPurchaseCategoryRow = (purchaseSummary: EventTicketPurchase[
         <span style="display: inline-block; max-width: 70%;"> ${summary.name} <span class="lighter" style="opacity: 0.5; font-size: 0.8em; display: inline-block; max-width: 70%;">x ${summary.amountToPurchase}</span></span>
         <span class="price" style="font-weight: 700; font-size: 1em; display: inline-block; max-width: 70%;">N${priceForQuantity}</span>
       </div>
-    `
-  })
+    `;
+  });
 
   return htmlContent;
-}
+};
 
-export const generatePurchaseReceiptEmail = (eventName: string, payload: Partial<TicketPurchase>) => {
-  const purchaseHTMLRows = generateTicketPurchaseCategoryRow(payload.ticketSummary as EventTicketPurchase[]);
+export const generatePurchaseReceiptEmail = (
+  eventName: string,
+  payload: Partial<TicketPurchase>
+) => {
+  const purchaseHTMLRows = generateTicketPurchaseCategoryRow(
+    payload.ticketSummary as EventTicketPurchase[]
+  );
 
   return `
   <!DOCTYPE html>
@@ -63,5 +70,5 @@ export const generatePurchaseReceiptEmail = (eventName: string, payload: Partial
   </body>
   </html>
   
-  `
-}
+  `;
+};

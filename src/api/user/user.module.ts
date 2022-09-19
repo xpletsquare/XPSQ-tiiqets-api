@@ -8,21 +8,20 @@ import { UserEventListeners } from "./user.events";
 import { UserRepository } from "./user.repository";
 import { UserService } from "./user.service";
 
-
 @Global()
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
         name: User.name,
-        schema: UserSchema
-      }
+        schema: UserSchema,
+      },
     ]),
     CommonModule,
-    EmailModule 
+    EmailModule,
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository, UserEventListeners],
-  exports: [UserService, UserRepository]
+  exports: [UserService, UserRepository],
 })
-export class UserModule { }
+export class UserModule {}

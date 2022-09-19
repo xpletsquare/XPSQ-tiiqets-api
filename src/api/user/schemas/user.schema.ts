@@ -27,27 +27,28 @@ export class User extends Document {
   activated: boolean;
 
   @Prop({ required: true })
-  hashedPassword: string
+  hashedPassword: string;
 
   @Prop({ default: false })
   flagged: boolean;
 
   toDto(): UserDTO {
-    return
+    return;
   } // implemented in schema methods
 
-  checkPassword: (password: string) => boolean
+  checkPassword: (password: string) => boolean;
 }
 
 export type UserDocument = Document & User;
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.toDto = function () {
-  const { id, email, phone, firstName, lastName, activated, flagged } = this as UserDocument;
-  return { id, email, phone, firstName, lastName, activated, flagged }
-}
+  const { id, email, phone, firstName, lastName, activated, flagged } =
+    this as UserDocument;
+  return { id, email, phone, firstName, lastName, activated, flagged };
+};
 
 UserSchema.methods.checkPassword = function (password: string) {
   const { hashedPassword } = this as UserDocument;
   return passwordMatches(password, hashedPassword);
-}
+};

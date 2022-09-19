@@ -1,7 +1,4 @@
-
-
 export class EventTicket {
-
   id: string;
 
   eventId: string;
@@ -16,16 +13,14 @@ export class EventTicket {
 
   nSold: number;
 
-  maxPurchases: number
+  maxPurchases: number;
 
   endSalesAt: number;
 
-  schedule: string // Uses the scehedule name
-
+  schedule: string; // Uses the scehedule name
 }
 
 export class EventTicketPurchase {
-
   id: string;
 
   eventId: string;
@@ -36,10 +31,9 @@ export class EventTicketPurchase {
 
   pricePerUnit: number;
 
-  amountToPurchase: number
+  amountToPurchase: number;
 
-  labels: string[]
-
+  labels: string[];
 }
 
 export class EventTicketUpdate {

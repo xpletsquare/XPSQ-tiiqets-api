@@ -1,12 +1,15 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { EventCategoryController } from './event-category.controller';
-import { EventCategoryService } from './event-category.service';
-import { EventController } from './event.controller';
-import { EventRepository } from './event.repository';
-import { EventService } from './event.service';
-import { EventCategory, EventCategorySchema } from './schemas/event-category.schema';
-import { Event, EventSchema } from './schemas/event.schema';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { EventCategoryController } from "./event-category.controller";
+import { EventCategoryService } from "./event-category.service";
+import { EventController } from "./event.controller";
+import { EventRepository } from "./event.repository";
+import { EventService } from "./event.service";
+import {
+  EventCategory,
+  EventCategorySchema,
+} from "./schemas/event-category.schema";
+import { Event, EventSchema } from "./schemas/event.schema";
 
 @Module({
   imports: [
@@ -18,11 +21,11 @@ import { Event, EventSchema } from './schemas/event.schema';
       {
         name: EventCategory.name,
         schema: EventCategorySchema,
-      }
+      },
     ]),
   ],
   controllers: [EventController, EventCategoryController],
   providers: [EventService, EventRepository, EventCategoryService],
-  exports: [EventRepository, EventService],
+  exports: [EventRepository, EventService, MongooseModule],
 })
 export class EventModule {}

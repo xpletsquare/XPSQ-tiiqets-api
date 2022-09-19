@@ -8,6 +8,6 @@ import { AuthService } from "./auth.service";
 @Module({
   imports: [CommonModule, UserModule],
   providers: [AuthService],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
-export class AuthModule { }
+export class AuthModule {}

@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-
 @Schema({ timestamps: true })
 export class Wallet {
-
   @Prop()
   id: string;
 
@@ -18,11 +16,10 @@ export class Wallet {
   ledgerBalance: number;
 
   @Prop()
-  bankDetailsId: string
+  bankDetailsId: string;
 
   @Prop({ default: false })
   locked: boolean;
-
 }
 
 export type WalletDocument = Document & Wallet;

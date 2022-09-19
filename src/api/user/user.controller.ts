@@ -1,4 +1,13 @@
-import { Body, CacheTTL, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  CacheTTL,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiOkResponse, ApiProduces, ApiTags } from "@nestjs/swagger";
 import { getQRCode } from "src/utilities";
 import { SuccessResponse } from "src/utilities/successMessage";
@@ -6,24 +15,20 @@ import { AdminGuard } from "../authentication/guards/admin.guard";
 import { SingleUserResponse, UserListResponse } from "./responses";
 import { UserService } from "./user.service";
 
-
-@ApiTags('User')
-@Controller('users')
+@ApiTags("User")
+@Controller("users")
 export class UserController {
-
-  constructor(
-    private userService: UserService
-  ) { }
+  constructor(private userService: UserService) {}
 
   readonly responses = {
-    success: 'success',
-    registrationSuccess: 'user registeration successful',
-    userFound: 'user data retrieved'
-  }
+    success: "success",
+    registrationSuccess: "user registeration successful",
+    userFound: "user data retrieved",
+  };
 
   @ApiOkResponse({
-    description: 'Users Retrieved',
-    type: UserListResponse
+    description: "Users Retrieved",
+    type: UserListResponse,
   })
   @UseGuards(AdminGuard)
   @CacheTTL(30) // Save response in cache for 30 seconds
@@ -34,18 +39,17 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    description: 'User Retrieved',
+    description: "User Retrieved",
     type: SingleUserResponse,
   })
-  @Get(':id')
-  async getUserInfo(@Param('id') id: string) {
+  @Get(":id")
+  async getUserInfo(@Param("id") id: string) {
     const userInfo = await this.userService.getSingleUser(id);
     return new SuccessResponse(this.responses.userFound, userInfo);
   }
 
-  @Put(':id')
+  @Put(":id")
   async updateUserInfo() {
-    return new SuccessResponse('user details updated', {})
+    return new SuccessResponse("user details updated", {});
   }
-
 }
