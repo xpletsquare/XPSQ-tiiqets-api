@@ -16,6 +16,4 @@ export class UpdateUserDTO {
   @IsString()
   @IsOptional()
   phone?: string;
-
 }
-

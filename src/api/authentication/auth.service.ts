@@ -132,7 +132,7 @@ export class AuthService {
 
     const hashedPassword = hashPassword(password);
     const updated = await this.userService.updateUserInfo(tokenPayload?.email, {
-      hashedPassword,
+      password: hashedPassword,
     });
 
     if (!updated) {
