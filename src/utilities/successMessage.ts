@@ -1,12 +1,12 @@
-import { Logger } from '@nestjs/common';
+import { Logger } from "@nestjs/common";
 
-const AppLogger = new Logger('RESPONSE');
+const AppLogger = new Logger("RESPONSE");
 
 export class SuccessResponse {
   message: string;
   data: unknown;
 
-  constructor(message = 'successful', data: unknown = null) {
+  constructor(message = "successful", data: unknown = null) {
     this.message = message;
     this.data = data;
   }
@@ -16,14 +16,14 @@ export class SuccessResponse {
 
     if (this.data) {
       return {
-        status: 'success',
+        status: "success",
         message: this.message,
         data: this.data,
       };
     }
 
     return {
-      status: 'success',
+      status: "success",
       message: this.message,
     };
   }

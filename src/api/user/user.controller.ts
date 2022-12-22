@@ -31,11 +31,11 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    description: 'User Retrieved',
+    description: "User Retrieved",
     type: SingleUserResponse,
   })
-  @Get(':id')
-  async getUserInfo(@Param('id') id: string) {
+  @Get(":id")
+  async getUserInfo(@Param("id") id: string) {
     const userInfo = await this.userService.getSingleUser(id);
     return new SuccessResponse(this.responses.userFound, userInfo);
   }

@@ -1,3 +1,4 @@
+
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilterQuery } from 'mongoose';
@@ -11,6 +12,7 @@ import { UpdateUserDTO } from './dtos/updateUser.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserRepository } from './user.repository';
 
+
 @Injectable()
 export class UserService {
   constructor(
@@ -19,7 +21,10 @@ export class UserService {
     private cacheService: CacheService,
   ) {}
 
-  private async getUser(idOrEmail: string, filterQuery: FilterQuery<UserDocument> | null = null) {
+  private async getUser(
+    idOrEmail: string,
+    filterQuery: FilterQuery<UserDocument> | null = null
+  ) {
     return this.userRepository.findOne(idOrEmail, filterQuery);
   }
 
@@ -27,7 +32,7 @@ export class UserService {
     const users = await this.userRepository.findUsers(filters);
 
     if (!users?.length) {
-      throw new NotFoundException('Users not found');
+      throw new NotFoundException("Users not found");
     }
 
     return users.map((user) => user.toDto());
@@ -52,7 +57,7 @@ export class UserService {
     const userData = await this.getUser(identifier);
 
     if (!userData) {
-      throw new NotFoundException('Invalid user');
+      throw new NotFoundException("Invalid user");
     }
 
     if (Object.keys(query).length) {
@@ -69,12 +74,15 @@ export class UserService {
   }
 
   async createTempUser(dto: CreateTempUserDTO) {
-    const existingUser = await this.getUser('', {
-      $or: [{ email: dto.email.toLowerCase() }, { phone: dto.phone.toLowerCase() }],
+    const existingUser = await this.getUser("", {
+      $or: [
+        { email: dto.email.toLowerCase() },
+        { phone: dto.phone.toLowerCase() },
+      ],
     });
 
     if (existingUser) {
-      throw new BadRequestException('User already exists with email/phone');
+      throw new BadRequestException("User already exists with email/phone");
     }
 
     const tempuser: Partial<User> = {
@@ -104,13 +112,13 @@ export class UserService {
     });
 
     if (existingUser) {
-      throw new BadRequestException('User already exists with email/phone');
+      throw new BadRequestException("User already exists with email/phone");
     }
 
     const user = await this.userRepository.createUser(dto);
 
     if (!user) {
-      throw new BadRequestException('Sorry, an error occurred');
+      throw new BadRequestException("Sorry, an error occurred");
     }
 
     const userDto = user.toDto();

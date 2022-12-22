@@ -3,30 +3,36 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { generateId, generatePaymentRef } from "src/utilities";
 import { EventService } from "../event/event.service";
 import { EventTicketPurchase } from "../event/schemas/event-ticket.schema";
-import { EventPurchaseItem, TicketPurchaseRequestDTO } from "./dtos/ticket_purchase.dto";
+import {
+  EventPurchaseItem,
+  TicketPurchaseRequestDTO,
+} from "./dtos/ticket_purchase.dto";
 import { TicketPurchase } from "./schemas/ticket_purchase.schema";
-
 
 @Injectable()
 export class TicketPurchaseHelper {
-
   constructor(
     private eventService: EventService,
     private eventEmitter: EventEmitter2
-  ) { }
+  ) {}
 
   async validateTicketPurchases(details: TicketPurchaseRequestDTO) {
     const event = await this.eventService.getEvent(details.eventId);
 
-    if (event.status !== 'ACTIVE') { // Check if date is passed
-      throw new BadRequestException('Tickets for this event cannnot be bought at this time');
+    if (event.status !== "ACTIVE") {
+      // Check if date is passed
+      throw new BadRequestException(
+        "Tickets for this event cannnot be bought at this time"
+      );
     }
 
-    const ticketsAreValid = details.purchases.every(purchase => {
-      const ticket = event.tickets.find(ticket => purchase.ticketId === ticket.id);
+    const ticketsAreValid = details.purchases.every((purchase) => {
+      const ticket = event.tickets.find(
+        (ticket) => purchase.ticketId === ticket.id
+      );
 
       if (!ticket) {
-        return false
+        return false;
       }
 
       const canPurchaseWantedAmount = ticket.maxPurchases >= purchase.count;
@@ -38,68 +44,92 @@ export class TicketPurchaseHelper {
     });
 
     if (!ticketsAreValid) {
-      throw new BadRequestException('please check tickets and the requested quantities');
+      throw new BadRequestException(
+        "please check tickets and the requested quantities"
+      );
     }
-
   }
 
-  async getTicketsSummaryForPurchase(eventId: string, purchases: EventPurchaseItem[]): Promise<EventTicketPurchase[]> {
-    // id, unitPrice, count, name, 
+  async getTicketsSummaryForPurchase(
+    eventId: string,
+    purchases: EventPurchaseItem[]
+  ): Promise<EventTicketPurchase[]> {
+    // id, unitPrice, count, name,
     const event = await this.eventService.getEvent(eventId);
 
-    const ticketPurchaseData: EventTicketPurchase[] = purchases.map(purchase => {
-      const ticketDetails = event.findTicket(purchase.ticketId);
+    const ticketPurchaseData: EventTicketPurchase[] = purchases.map(
+      (purchase) => {
+        const ticketDetails = event.findTicket(purchase.ticketId);
 
-      const { id, name, description, price, eventId } = ticketDetails;
+        const { id, name, description, price, eventId } = ticketDetails;
 
-      return {
-        id,
-        name,
-        description,
-        eventId,
-        amountToPurchase: purchase.count,
-        pricePerUnit: price,
-        labels: purchase.labels
+        return {
+          id,
+          name,
+          description,
+          eventId,
+          amountToPurchase: purchase.count,
+          pricePerUnit: price,
+          labels: purchase.labels,
+        };
       }
-    });
+    );
 
     return ticketPurchaseData;
   }
 
   async createTempTicketPurchase(purchaseData: TicketPurchaseRequestDTO) {
-    const ticketSummary = await this.getTicketsSummaryForPurchase(purchaseData.eventId, purchaseData.purchases);
+    const ticketSummary = await this.getTicketsSummaryForPurchase(
+      purchaseData.eventId,
+      purchaseData.purchases
+    );
     const cost = this.calculateCostOfPurchase(ticketSummary);
 
     const ticketPurchase: Partial<TicketPurchase> = {
       id: generateId(),
       cost,
-      paymentRef: generatePaymentRef() + '',
+      paymentRef: generatePaymentRef() + "",
       paymentDate: new Date().toISOString(),
       paid: false,
       ticketSummary,
       eventId: purchaseData.eventId,
       userEmail: purchaseData.userEmail,
-      promoterCode: purchaseData.promoterCode || null
-    }
+      promoterCode: purchaseData.promoterCode || null,
+    };
 
     return ticketPurchase;
   }
 
-  async generateTicketData(eventId: string, ticketSummary: EventTicketPurchase, purchaseRef: string, userEmail: string) {
+  async generateTicketData(
+    eventId: string,
+    ticketSummary: EventTicketPurchase,
+    purchaseRef: string,
+    userEmail: string
+  ) {
     const event = await this.eventService.getEvent(eventId);
 
-    const canBuyTickets = await event.canBuyTicketAmount(ticketSummary.amountToPurchase, ticketSummary.id);
+    const canBuyTickets = await event.canBuyTicketAmount(
+      ticketSummary.amountToPurchase,
+      ticketSummary.id
+    );
 
     if (!canBuyTickets) {
-      console.log('insufficient ticket quantity');
-      this.eventEmitter.emit('initiate.ticket.refund', { ticketSummary, purchaseRef, userEmail });
+      console.log("insufficient ticket quantity");
+      this.eventEmitter.emit("initiate.ticket.refund", {
+        ticketSummary,
+        purchaseRef,
+        userEmail,
+      });
       return [];
     }
 
-    const updated = await event.updateTicketCount(ticketSummary.amountToPurchase, ticketSummary.id);
+    const updated = await event.updateTicketCount(
+      ticketSummary.amountToPurchase,
+      ticketSummary.id
+    );
 
     if (!updated) {
-      console.log('event ticket count update failed');
+      console.log("event ticket count update failed");
       return [];
     }
 
@@ -107,9 +137,11 @@ export class TicketPurchaseHelper {
 
     const getDateForTicket = () => {
       const ticketData = event.findTicket(ticketSummary.id);
-      const schedule = event.schedules.find(schedule => schedule.name === ticketData.schedule);
+      const schedule = event.schedules.find(
+        (schedule) => schedule.name === ticketData.schedule
+      );
       return schedule.date;
-    }
+    };
 
     const generatedTickets = [];
 
@@ -117,7 +149,7 @@ export class TicketPurchaseHelper {
       const ticket = {
         id: generateId(),
         userEmail,
-        label: labels[index] || '',
+        label: labels[index] || "",
         type: ticketSummary.name,
         price: ticketSummary.pricePerUnit,
         purchaseRef,
@@ -126,8 +158,8 @@ export class TicketPurchaseHelper {
           title: event.title,
           image: event.image,
           venue: event.venue,
-          date: getDateForTicket()
-        }
+          date: getDateForTicket(),
+        },
       };
 
       generatedTickets.push(ticket);
@@ -139,14 +171,10 @@ export class TicketPurchaseHelper {
   calculateCostOfPurchase(purchases: EventTicketPurchase[]) {
     let total = 0;
 
-    purchases.forEach(purchase => {
-      total += purchase.pricePerUnit * purchase.amountToPurchase
-    })
+    purchases.forEach((purchase) => {
+      total += purchase.pricePerUnit * purchase.amountToPurchase;
+    });
 
     return total;
   }
-
-
-
-
 }

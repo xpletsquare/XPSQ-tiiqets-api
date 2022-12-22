@@ -1,10 +1,9 @@
 import { TicketPurchased } from "src/api/purchase_ticket/schemas/ticket_purchase.schema";
-import { getQRCode } from "src/utilities"
-
+import { getQRCode } from "src/utilities";
 
 export const generateTicketEmail = async (ticketDetails: TicketPurchased) => {
   const qrLink = await getQRCode(ticketDetails);
-  const href = `http://127.0.0.1:5500/src/api/emails/templates/qr.html?qrcode=${qrLink}`
+  const href = `http://127.0.0.1:5500/src/api/emails/templates/qr.html?qrcode=${qrLink}`;
 
   return `
     <!DOCTYPE html>
@@ -57,5 +56,5 @@ export const generateTicketEmail = async (ticketDetails: TicketPurchased) => {
       </main>
     </body>
     </html>
-  `
-}
+  `;
+};

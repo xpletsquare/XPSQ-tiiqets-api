@@ -1,8 +1,7 @@
 import { Module } from "@nestjs/common";
 
-
 @Module({
   providers: [],
   controllers: [],
 })
-export class AdminModule { }
+export class AdminModule {}

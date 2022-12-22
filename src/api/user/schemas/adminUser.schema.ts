@@ -1,7 +1,6 @@
 import { Prop, SchemaFactory, Schema } from "@nestjs/mongoose";
 import { passwordMatches } from "src/utilities";
 
-
 @Schema({ timestamps: true })
 export class AdminUser extends Document {
   @Prop({ required: true })
@@ -20,16 +19,17 @@ export class AdminUser extends Document {
   lastName: string;
 
   @Prop({ required: true })
-  hashedPassword: string
+  hashedPassword: string;
 
   @Prop({ default: false })
   flagged: boolean;
 
   toDto(): Partial<AdminUser> {
-    return
+    return;
   } // implemented in schema methods
 
-  checkPassword(password: string): boolean { // implemented in schema methods
+  checkPassword(password: string): boolean {
+    // implemented in schema methods
     return;
   }
 }
@@ -39,10 +39,10 @@ export const AdminUserSchema = SchemaFactory.createForClass(AdminUser);
 
 AdminUserSchema.methods.toDto = function () {
   const { id, email, phone, firstName, lastName } = this as any;
-  return { id, email, phone, firstName, lastName }
-}
+  return { id, email, phone, firstName, lastName };
+};
 
 AdminUserSchema.methods.checkPassword = function (password: string) {
   const { hashedPassword } = this as any;
   return passwordMatches(password, hashedPassword);
-}
+};

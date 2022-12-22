@@ -1,22 +1,19 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 
-
 @Schema({ timestamps: true })
 export class EventTicket {
-
   @Prop()
   id: string;
 
   @Prop()
-  name: string
+  name: string;
 
   @Prop()
-  eventId: string
+  eventId: string;
 
   @Prop()
   price: number;
-
 }
 
 export const EventTicketSchema = SchemaFactory.createForClass(EventTicket);

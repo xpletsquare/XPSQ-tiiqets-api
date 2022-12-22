@@ -1,10 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsIn, IsNumber, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator';
-import { IEventSchedule } from 'src/interfaces';
-import { EventTicket } from '../schemas/event-ticket.schema';
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsArray,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  IsUUID,
+} from "class-validator";
+import { IEventSchedule } from "src/interfaces";
+import { EventTicket } from "../schemas/event-ticket.schema";
 
 export class CreateEventDTO {
-
   id?: string;
 
   @ApiProperty()
@@ -16,19 +23,19 @@ export class CreateEventDTO {
   title: string;
 
   @ApiProperty()
-  @IsString({ message: 'event description must be provided' })
+  @IsString({ message: "event description must be provided" })
   description: string;
 
   @ApiProperty()
-  @IsString({ message: 'event category must be provided' })
+  @IsString({ message: "event category must be provided" })
   category: string;
 
   @ApiProperty()
   @IsString()
   venue: string;
 
-  @IsIn(['single', 'multiple'])
-  occurrence: "single" | "multiple" | ""
+  @IsIn(["single", "multiple"])
+  occurrence: "single" | "multiple" | "";
 
   @IsArray()
   schedules: IEventSchedule[];
@@ -40,13 +47,12 @@ export class CreateEventDTO {
   tags: string[];
 
   @ApiProperty()
-  @IsUrl({}, { message: 'please upload a valid landscape image' })
+  @IsUrl({}, { message: "please upload a valid landscape image" })
   @IsOptional()
   landscapeImage: string;
 
   @ApiProperty()
-  @IsUrl({}, { message: 'please upload a valid landscape image' })
+  @IsUrl({}, { message: "please upload a valid landscape image" })
   @IsOptional()
   portraitImage: string;
-
 }

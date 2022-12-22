@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "../schemas/user.schema";
 
-
-type UserDTO = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'flagged' | 'phone' | 'activated'>
+type UserDTO = Pick<
+  User,
+  "id" | "email" | "firstName" | "lastName" | "flagged" | "phone" | "activated"
+>;
 
 export class UserListResponse {
-
   @ApiProperty()
   status: string;
 
@@ -13,12 +14,10 @@ export class UserListResponse {
   message: string;
 
   @ApiProperty()
-  data: UserDTO[]
-
+  data: UserDTO[];
 }
 
 export class SingleUserResponse {
-
   @ApiProperty()
   status: string;
 
@@ -26,6 +25,5 @@ export class SingleUserResponse {
   message: string;
 
   @ApiProperty()
-  data: UserDTO
-
+  data: UserDTO;
 }

@@ -1,5 +1,4 @@
-import { UserDTO } from "src/interfaces"
-
+import { UserDTO } from "src/interfaces";
 
 export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
   return `
@@ -13,7 +12,9 @@ export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
 
     <body style="padding: 10vh 10vw; background-color: rgb(243, 243, 243);">
       <main style="max-width: 700px; margin: 1em auto; background-color: white; box-shadow: 0px 0px 20px  lightgray; padding: 3em;">    
-        <div class="greeting" style="margin: 1em 0;">Hi <span style="text-transform: capitalize">${user.firstName}</span> </div>
+        <div class="greeting" style="margin: 1em 0;">Hi <span style="text-transform: capitalize">${
+          user.firstName
+        }</span> </div>
     
         <div class="message" style="margin: 1.4em 0;">
           <div style="margin: 1em 0;">Welcome to XPSQ</div>
@@ -21,7 +22,9 @@ export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
     
         <div class="footer" style="margin: 1.4em 0; margin-top: 100px; opacity: 0.5; font-size: 0.8em;">
           <div style="margin: 1.4em 0;">
-            This email was intended for ${user.firstName + ' ' + user.lastName}  (${user.email}). 
+            This email was intended for ${
+              user.firstName + " " + user.lastName
+            }  (${user.email}). 
             If you received this by mistake or have any questions, please reach out to us on
             support@xpsq.com.
           </div>
@@ -33,5 +36,5 @@ export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
       </main>
     </body>
   </html>
-  `
-}
+  `;
+};

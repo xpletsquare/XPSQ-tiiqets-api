@@ -1,22 +1,22 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { EventTicketPurchase } from 'src/api/event/schemas/event-ticket.schema';
-import { EventPurchaseItem } from '../dtos/ticket_purchase.dto';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
+import { EventTicketPurchase } from "src/api/event/schemas/event-ticket.schema";
+import { EventPurchaseItem } from "../dtos/ticket_purchase.dto";
 
 export interface TicketPurchased {
-  id: string,
-  userEmail: string,
-  label: string,
-  type: string,
-  price: number,
-  purchaseRef: string,
+  id: string;
+  userEmail: string;
+  label: string;
+  type: string;
+  price: number;
+  purchaseRef: string;
   event: {
-    id: string,
-    title: string,
-    image: string,
-    venue: string,
-    date: string
-  }
+    id: string;
+    title: string;
+    image: string;
+    venue: string;
+    date: string;
+  };
 }
 
 @Schema({ timestamps: true })
@@ -40,7 +40,7 @@ export class TicketPurchase extends Document {
   paid: boolean;
 
   @Prop({ default: 0.0 })
-  refundAmount: number
+  refundAmount: number;
 
   @Prop({ default: false })
   refunded: boolean;
@@ -59,4 +59,5 @@ export class TicketPurchase extends Document {
 }
 
 export type TicketPurchaseDocument = Document & TicketPurchase;
-export const TicketPurchaseSchema = SchemaFactory.createForClass(TicketPurchase);
+export const TicketPurchaseSchema =
+  SchemaFactory.createForClass(TicketPurchase);

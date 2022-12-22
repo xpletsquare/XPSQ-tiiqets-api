@@ -20,23 +20,29 @@ export class TicketPurchaseEvents {
     private ticketPurchaseService: TicketPurchaseService,
     private mailSevice: EmailService,
     private eventService: EventService
-  ) { }
+  ) {}
 
-  private readonly logger = new Logger()
+  private readonly logger = new Logger();
 
-  @OnEvent('ticket.purchase.verified') // TODO: move to a constant or enum
+  @OnEvent("ticket.purchase.verified") // TODO: move to a constant or enum
   async handleTicketPurchaseVerified(payload: PaystackValidationResponse) {
-    console.log('ticket purchase validation event handler called');
+    console.log("ticket purchase validation event handler called");
 
     const key = `PURCHASE-${payload.data.reference}`;
-    const ticketPurchaseDetails = await this.cacheService.get(key) as Partial<TicketPurchase>;
+    const ticketPurchaseDetails = (await this.cacheService.get(
+      key
+    )) as Partial<TicketPurchase>;
 
     if (!ticketPurchaseDetails) {
-      this.logger.log(`INVALID TICKET PURCHASE WITH REFERENCE - ${payload.data.reference}`)
+      this.logger.log(
+        `INVALID TICKET PURCHASE WITH REFERENCE - ${payload.data.reference}`
+      );
       return;
     }
 
-    const ticketPurchaseInDb = await this.ticketPurchaseRepo.findOne('', { paymentRef: payload.data.reference });
+    const ticketPurchaseInDb = await this.ticketPurchaseRepo.findOne("", {
+      paymentRef: payload.data.reference,
+    });
 
     if (ticketPurchaseInDb) {
       return;
@@ -46,17 +52,16 @@ export class TicketPurchaseEvents {
     const saved = await this.ticketPurchaseRepo.create(ticketPurchaseDetails);
 
     if (!saved) {
-      this.logger.error('TICKET PURCHASE UPDATE FAILED')
+      this.logger.error("TICKET PURCHASE UPDATE FAILED");
     }
 
-    this.eventEmitter.emit('ticket.purchase.saved', saved.toObject());
+    this.eventEmitter.emit("ticket.purchase.saved", saved.toObject());
     // await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
   }
 
-  @OnEvent('ticket.purchase.saved')
+  @OnEvent("ticket.purchase.saved")
   async handleTicketPurchaseSaved(payload: Partial<TicketPurchase>) {
-
-    for (let summary of payload.ticketSummary) {
+    for (const summary of payload.ticketSummary) {
       const tickets = await this.ticketPurchaseHelper.generateTicketData(
         payload.eventId,
         summary as EventTicketPurchase,
@@ -69,7 +74,9 @@ export class TicketPurchaseEvents {
 
     const event = await this.eventService.getEvent(payload.eventId);
 
-    await this.ticketPurchaseService.updateTicketPurchase(payload.id, { tickets: payload.tickets });
+    await this.ticketPurchaseService.updateTicketPurchase(payload.id, {
+      tickets: payload.tickets,
+    });
 
     await this.mailSevice.sendPurchaseConfirmation(event.title, payload);
 
@@ -78,24 +85,24 @@ export class TicketPurchaseEvents {
     // })
 
     if (payload.promoterCode) {
-      this.eventEmitter.emit('event.promotion.credit', {
+      this.eventEmitter.emit("event.promotion.credit", {
         promoterCode: payload.promoterCode,
-        amount: payload.cost * 0.02 // TODO: Move to Redis
-      })
+        amount: payload.cost * 0.02, // TODO: Move to Redis
+      });
     }
 
-    this.eventEmitter.emit('tickets.generated', payload.tickets);
+    this.eventEmitter.emit("tickets.generated", payload.tickets);
   }
 
-  @OnEvent('event.promotion.credit')
+  @OnEvent("event.promotion.credit")
   async handleCreditUserRequest(payload) {
-    this.logger.log(`CREDIT REQUEST RECEIVED - PROMOTERCODE - ${payload.promoterCode}`);
+    this.logger.log(
+      `CREDIT REQUEST RECEIVED - PROMOTERCODE - ${payload.promoterCode}`
+    );
     console.log(payload);
 
     // find user having promoterCode
     // find user wallet
     // topUp with credit amount
   }
-
-
 }

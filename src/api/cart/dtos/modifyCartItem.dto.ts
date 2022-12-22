@@ -1,7 +1,4 @@
-
-
 import { IsNumber, IsString } from "class-validator";
-
 
 export class ModifyCartItemDTO {
   @IsString()
@@ -11,5 +8,5 @@ export class ModifyCartItemDTO {
   ticketType: string;
 
   @IsNumber()
-  quantity: number
+  quantity: number;
 }
