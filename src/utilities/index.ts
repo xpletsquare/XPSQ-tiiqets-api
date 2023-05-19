@@ -83,14 +83,9 @@ export const generatePin = (numLength = 6) => {
   if (CONFIG.NODE_ENV === "development") {
     return 123456;
   }
-
-  let pin = "";
-
-  for (let i = 0; i < numLength; i++) {
-    pin += Math.random() * 10;
-  }
-
-  return parseInt(pin);
+  const pinWithDecimals = Math.random() * 10**numLength;
+  const pinAsString = Math.ceil(pinWithDecimals) + '';
+  return pinAsString.length === numLength ? pinAsString : generatePin(numLength);
 };
 
 export const getQRCode = async (value): Promise<string> => {
