@@ -21,8 +21,8 @@ export class EmailService {
       message: email,
       recipients: [user.email],
       isHtml: true,
-      subject: "Activate Account - XPSQ Tickets",
-      sender: "Uzu Tickets <verify@uzutickets.com>",
+      subject: "Activate Account - Uzu Ticket",
+      sender: "Uzu Tickets <verify@uzuticket.com>",
     });
 
     return sent || null;
@@ -38,8 +38,8 @@ export class EmailService {
       message: email,
       recipients: [user.email],
       isHtml: true,
-      subject: "Welcome to XPSQ - XPSQ",
-      sender: "Uzu Tickets <welcome@uzutickets.com>",
+      subject: "Welcome to Uzu Ticket",
+      sender: "Uzu Tickets <welcome@uzuticket.com>",
     });
 
     return sent || null;
@@ -51,8 +51,8 @@ export class EmailService {
       message: email,
       recipients: ["kenovienadu@gmail.com"],
       isHtml: true,
-      subject: "Login Alert - Uzu Tickets",
-      sender: "Uzu Tickets <alerts@uzutickets.com>",
+      subject: "Login Alert - Uzu Ticket",
+      sender: "Uzu Tickets <alerts@uzuticket.com>",
     });
 
     return sent || null;
@@ -80,8 +80,8 @@ export class EmailService {
       message: html,
       recipients: ["kenovienadu@gmail.com"],
       isHtml: true,
-      subject: "Thanks for your Ticket Purchase - Uzu Tickets",
-      sender: "Uzu Tickets <purchases@uzutickets.com>",
+      subject: "Thanks for your Ticket Purchase - Uzu Ticket",
+      sender: "Uzu Tickets <purchases@uzuticket.com>",
     });
 
     return sent || null;
@@ -98,8 +98,8 @@ export class EmailService {
       message: html,
       recipients: ["kenovienadu@gmail.com"],
       isHtml: true,
-      subject: `Ticket Details - Uzu Tickets - ${ticketDetails.id}`,
-      sender: "Uzu Tickets <purchases@uzutickets.com>",
+      subject: `Ticket Details - Uzu Ticket - ${ticketDetails.id}`,
+      sender: "Uzu Tickets <purchases@uzuticket.com>",
     });
 
     return sent || null;
