@@ -4,6 +4,7 @@ export const generateUserActivationEmail = (
   user: Partial<UserDTO>,
   activationPin: number
 ) => {
+  console.log({ activationPin });
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -33,7 +34,7 @@ export const generateUserActivationEmail = (
           } </span> (${
     user.email
   }). If you received this by mistake or have any questions, please reach out to us on
-          support@xpsq.com.
+          support@uzuticket.com.
         </div>
   
         <div style="margin: 1em 0;">
