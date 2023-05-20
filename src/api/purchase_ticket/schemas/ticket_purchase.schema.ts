@@ -6,6 +6,7 @@ import { EventPurchaseItem } from "../dtos/ticket_purchase.dto";
 export interface TicketPurchased {
   id: string;
   userEmail: string;
+  userFullname: string;
   label: string;
   type: string;
   price: number;

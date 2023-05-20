@@ -26,7 +26,7 @@ export class UserEventListeners {
 
     console.log({
       user: payload.user.email,
-      activationPin: payload,
+      activationPin: payload.activationPin,
     });
 
     // send activation email
