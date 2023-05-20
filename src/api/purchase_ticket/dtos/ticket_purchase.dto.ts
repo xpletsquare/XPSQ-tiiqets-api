@@ -19,6 +19,12 @@ export class TicketPurchaseRequestDTO {
   userEmail: string;
 
   @IsString()
+  userFirstName: string;
+
+  @IsString()
+  userLastName: string;
+
+  @IsString()
   @IsOptional()
   promoterCode: string;
 }
@@ -28,4 +34,6 @@ export interface EventPurchaseItem {
   count: number;
   labels: string[];
   userEmail: string;
+  userFirstName: string;
+  userLastName: string;
 }

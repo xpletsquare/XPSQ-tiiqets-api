@@ -1,4 +1,4 @@
-import { Body, CacheTTL, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, CacheTTL, Controller, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { getQRCode } from 'src/utilities';
 import { SuccessResponse } from 'src/utilities/successMessage';
@@ -6,6 +6,8 @@ import { AdminGuard } from '../authentication/guards/admin.guard';
 import { UpdateUserDTO } from './dtos/updateUser.dto';
 import { SingleUserResponse, UserListResponse } from './responses';
 import { UserService } from './user.service';
+import { LoggedInGuard } from '../authentication/guards/loggedIn.guard';
+import { AuthUserInterceptor } from '../authentication/interceptors/authuser.interceptor';
 
 @ApiTags('User')
 @Controller('users')
@@ -41,9 +43,9 @@ export class UserController {
   }
 
   @Put(':id')
-  async updateUserInfo(@Param('id') id: string, @Body() body: UpdateUserDTO) {
-    const updatedUser = await this.userService.updateUserInfo(id, body);
-
+  @UseGuards(LoggedInGuard)
+  async updateUserInfo(@Param('id') id: string, @Body() body: UpdateUserDTO, @Req() req) {
+    const updatedUser = await this.userService.updateUserInfo(req.user.id, body);
     return new SuccessResponse('user details updated', updatedUser);
   }
 }

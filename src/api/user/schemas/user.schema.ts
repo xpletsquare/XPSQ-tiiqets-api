@@ -32,6 +32,9 @@ export class User extends Document {
   @Prop({ default: false })
   flagged: boolean;
 
+  @Prop({ default: false })
+  isAdmin: boolean;
+
   toDto(): UserDTO {
     return;
   } // implemented in schema methods

@@ -1,8 +1,13 @@
-import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { EventStatus } from "../schemas/event.schema";
 
 export class UpdateEventTicketDTO {
   @IsUUID()
   eventId: string;
+
+  @IsOptional()
+  @IsEnum(EventStatus)
+  status?: EventStatus
 
   @IsUUID()
   id: string;

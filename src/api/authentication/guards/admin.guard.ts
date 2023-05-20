@@ -12,8 +12,7 @@ export class AdminGuard implements CanActivate {
       const payload = await verifyAndDecodeJWTToken(token);
       if (!payload || !payload.id) return false; //throw new UnauthorizedException;
 
-      console.log(payload);
-      return payload && true;
+      return payload && payload.isAdmin;
     }
 
     return false;

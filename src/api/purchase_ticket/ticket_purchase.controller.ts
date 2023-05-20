@@ -7,12 +7,12 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { throwHttpError } from "src/utilities/errorMessage";
 import { SuccessResponse } from "src/utilities/successMessage";
 import { TicketPurchaseRequestDTO } from "./dtos/ticket_purchase.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { TicketPurchaseService } from "./ticket_purchase.service";
 import { LoggedInGuard } from "../authentication/guards/loggedIn.guard";
+import { AdminGuard } from "../authentication/guards/admin.guard";
 
 @ApiTags("Purchases")
 @Controller("purchase-tickets")
@@ -21,12 +21,11 @@ export class TicketPurchaseController {
 
   @Post("initiate")
   async initiatePurchase(@Body() body: TicketPurchaseRequestDTO) {
-    console.log({ body });
     const data = await this.ticketPurchaseService.initiatePurchase(body);
     return new SuccessResponse("success", data);
   }
 
-  @UseGuards(LoggedInGuard)
+  @UseGuards(AdminGuard)
   @Get("recents")
   async getRecentTicketPurchases() {
     const purchases = await this.ticketPurchaseService.getTicketPurchases();

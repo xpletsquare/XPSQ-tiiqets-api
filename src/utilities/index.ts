@@ -119,6 +119,12 @@ export const generatePaymentRef = () => {
 
 export const generatePromoterCode = () => nanoid();
 
+export const formatCurrency = (value: number, removeDecimals = true) => {
+  const options = { style: 'currency', currency: 'NGN' };
+  const formattedValue = value.toLocaleString('en-NG', options);
+  return removeDecimals ? formattedValue.split('.')[0] : formattedValue;
+}
+
 export const getEventStartAndEndDate = (
   schedules: IEventSchedule[]
 ): [Timestamp, Timestamp] => {

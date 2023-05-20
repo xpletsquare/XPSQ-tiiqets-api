@@ -8,6 +8,7 @@ import {
   TicketPurchaseRequestDTO,
 } from "./dtos/ticket_purchase.dto";
 import { TicketPurchase } from "./schemas/ticket_purchase.schema";
+import { NUMBERS } from "../../constants";
 
 @Injectable()
 export class TicketPurchaseHelper {
@@ -36,10 +37,10 @@ export class TicketPurchaseHelper {
       }
 
       const canPurchaseWantedAmount = ticket.maxPurchases >= purchase.count;
-
       const available = ticket.nLimit - ticket.nSold;
       const ticketNumbersAreAvailable = available >= purchase.count;
 
+      console.log({ ticket, canPurchaseWantedAmount, available, ticketNumbersAreAvailable });
       return ticketNumbersAreAvailable && canPurchaseWantedAmount;
     });
 
@@ -54,13 +55,11 @@ export class TicketPurchaseHelper {
     eventId: string,
     purchases: EventPurchaseItem[]
   ): Promise<EventTicketPurchase[]> {
-    // id, unitPrice, count, name,
     const event = await this.eventService.getEvent(eventId);
 
     const ticketPurchaseData: EventTicketPurchase[] = purchases.map(
       (purchase) => {
         const ticketDetails = event.findTicket(purchase.ticketId);
-
         const { id, name, description, price, eventId } = ticketDetails;
 
         return {
@@ -75,6 +74,8 @@ export class TicketPurchaseHelper {
       }
     );
 
+    console.log({ ticketPurchaseData });
+
     return ticketPurchaseData;
   }
 
@@ -83,17 +84,19 @@ export class TicketPurchaseHelper {
       purchaseData.eventId,
       purchaseData.purchases
     );
-    const cost = this.calculateCostOfPurchase(ticketSummary);
 
+    const cost = this.calculateCostOfPurchase(ticketSummary);
     const ticketPurchase: Partial<TicketPurchase> = {
       id: generateId(),
       cost,
       paymentRef: generatePaymentRef() + "",
       paymentDate: new Date().toISOString(),
-      paid: false,
+      paid: cost === NUMBERS.Zero,
       ticketSummary,
       eventId: purchaseData.eventId,
       userEmail: purchaseData.userEmail,
+      userFirstName: purchaseData.userFirstName,
+      userLastName: purchaseData.userLastName,
       promoterCode: purchaseData.promoterCode || null,
     };
 
@@ -107,7 +110,6 @@ export class TicketPurchaseHelper {
     userEmail: string
   ) {
     const event = await this.eventService.getEvent(eventId);
-
     const canBuyTickets = await event.canBuyTicketAmount(
       ticketSummary.amountToPurchase,
       ticketSummary.id
@@ -138,8 +140,15 @@ export class TicketPurchaseHelper {
     const getDateForTicket = () => {
       const ticketData = event.findTicket(ticketSummary.id);
       const schedule = event.schedules.find(
-        (schedule) => schedule.name === ticketData.schedule
+        (schedule) => {
+          if (typeof ticketData.schedule === 'string') {
+            return schedule.name.toLowerCase() === ticketData.schedule.toLowerCase();
+          }
+
+          return schedule.name.toLowerCase() === ticketData.schedule.name.toLowerCase();
+        }
       );
+
       return schedule.date;
     };
 

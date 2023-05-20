@@ -49,7 +49,7 @@ export interface PaystackTransactionConfig {
 export interface PaystackValidationResponse {
   status: boolean;
   message: string;
-  data: {
+  data: Partial<{
     id: string;
     domain: string;
     status: string;
@@ -72,5 +72,5 @@ export interface PaystackValidationResponse {
       customer_code: string;
       phone: string;
     };
-  };
+  }>;
 }
