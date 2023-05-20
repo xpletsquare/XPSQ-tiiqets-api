@@ -21,6 +21,7 @@ export class TicketPurchaseController {
 
   @Post("initiate")
   async initiatePurchase(@Body() body: TicketPurchaseRequestDTO) {
+    console.log({ body });
     const data = await this.ticketPurchaseService.initiatePurchase(body);
     return new SuccessResponse("success", data);
   }
