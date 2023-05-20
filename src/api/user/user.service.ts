@@ -59,7 +59,6 @@ export class UserService {
   async updateUserInfo(identifier: string, updates: UpdateUserDTO) {
     const query: any = {};
 
-    // if (updates.email) query.email = updates.email;
     if (updates.phone) query.phone = updates.phone;
 
     const userData = await this.getUser(identifier);

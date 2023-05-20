@@ -22,6 +22,8 @@ export class TicketPurchaseRepository {
       id: generateId(),
     };
 
+    console.log({ dataToSave });
+
     const event = await this.ticketPurchase.create(dataToSave);
     return event || null;
   }
@@ -46,7 +48,7 @@ export class TicketPurchaseRepository {
       .find(filterQuery || {})
       .limit(+limit)
       .skip(+skip)
-      .sort({ created_at: "asc" })
+      .sort({ created_at: "desc" })
       .exec();
 
     return events;

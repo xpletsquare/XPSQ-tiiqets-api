@@ -4,6 +4,8 @@ import { FilterQuery, Model } from "mongoose";
 import { Event, EventDocument, EventStatus } from "./schemas/event.schema";
 import { CreateEventDTO } from "./dtos/create-event.dto";
 import { generateId, getEventStartAndEndDate } from "src/utilities";
+import { title } from "process";
+import { NUMBERS } from "../../constants";
 
 @Injectable()
 export class EventRepository {
@@ -17,8 +19,11 @@ export class EventRepository {
     const tickets = dto.tickets.map((ticket) => {
       return {
         ...ticket,
+        name: ticket.name || title,
+        price: Number(ticket.price),
+        nLimit: Number(ticket.nLimit),
+        nSold: NUMBERS.Zero,
         id: generateId(),
-        nSold: 0,
       };
     });
 

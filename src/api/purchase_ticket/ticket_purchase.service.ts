@@ -9,6 +9,8 @@ import { CacheService } from "../common/providers/cache.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { TicketPurchaseHelper } from "./helper.service";
 import { TicketPurchaseRepository } from "./ticket_purchase.repository";
+import { NUMBERS } from "../../constants";
+import { TICKET_EVENTS } from "./ticket_purchase.events";
 
 @Injectable()
 export class TicketPurchaseService {
@@ -22,30 +24,33 @@ export class TicketPurchaseService {
 
   async initiatePurchase(dto: TicketPurchaseRequestDTO) {
     await this.ticketPurchaseHelper.validateTicketPurchases(dto);
-
-    const ticketPurchase =
-      await this.ticketPurchaseHelper.createTempTicketPurchase(dto);
-
-    const paystackResponse = await this.paystackService.initiateTransaction(
-      ticketPurchase.userEmail,
-      ticketPurchase.cost,
-      ticketPurchase.paymentRef
-    );
-
-    if (!paystackResponse) {
-      throw new BadRequestException(
-        "Unable to proceed. Please try again later"
-      );
-    }
+    const ticketPurchase = await this.ticketPurchaseHelper.createTempTicketPurchase(dto);
+    const response: Record<string, any> = { purchase: ticketPurchase };
 
     // save ticket purchase to redis
     const key = `PURCHASE-${ticketPurchase.paymentRef}`;
     await this.cacheService.set(key, ticketPurchase);
 
-    return {
-      purchase: ticketPurchase,
-      payment: paystackResponse,
-    };
+    const userShouldMakePayment = ticketPurchase.cost > NUMBERS.Zero;
+    if (userShouldMakePayment) {
+      const paystackResponse = await this.paystackService.initiateTransaction(
+        ticketPurchase.userEmail,
+        ticketPurchase.cost,
+        ticketPurchase.paymentRef
+      );
+  
+      if (!paystackResponse) {
+        throw new BadRequestException(
+          "Unable to proceed. Please try again later"
+        );
+      }
+
+      response.payment = paystackResponse; // send payment data along with event data
+    } else {
+      this.eventEmitter.emit(TICKET_EVENTS.FREE_TICKET_PURCHASED, ticketPurchase.paymentRef);
+    }
+
+    return response;
   }
 
   async verifyTicketPayment(reference_id: string) {
@@ -70,7 +75,9 @@ export class TicketPurchaseService {
   }
 
   async getTicketPurchases(query = {}) {
-    const purchases = await this.ticketPurchaseRepo.find(query);
+    const purchases = await this.ticketPurchaseRepo.find({
+      ...query,
+    })
     return purchases.map((purchase) => {
       const { tickets, _id, __v, ...rest } = purchase.toObject();
       return rest;

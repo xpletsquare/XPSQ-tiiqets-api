@@ -1,9 +1,13 @@
+import { IEventSchedule } from "../../../interfaces";
+
 export class EventTicket {
   id: string;
 
   eventId: string;
 
   name: string;
+
+  title?: string;
 
   description: string;
 
@@ -17,7 +21,7 @@ export class EventTicket {
 
   endSalesAt: number;
 
-  schedule: string; // Uses the scehedule name
+  schedule: string | IEventSchedule; // Uses the scehedule name
 }
 
 export class EventTicketPurchase {

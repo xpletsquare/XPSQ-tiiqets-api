@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { PaystackValidationResponse } from "src/interfaces";
 import { CacheService } from "../common/providers/cache.service";
@@ -10,6 +10,12 @@ import { TicketPurchase } from "./schemas/ticket_purchase.schema";
 import { TicketPurchaseRepository } from "./ticket_purchase.repository";
 import { TicketPurchaseService } from "./ticket_purchase.service";
 
+export enum TICKET_EVENTS {
+  FREE_TICKET_PURCHASED = "free.ticket.purchase",
+  TICKET_PURCHASE_VERIFIED = "ticket.purchase.verified",
+  TICKET_PURCHASE_SAVED = "ticket.purchase.saved",
+}
+
 @Injectable()
 export class TicketPurchaseEvents {
   constructor(
@@ -17,6 +23,7 @@ export class TicketPurchaseEvents {
     private ticketPurchaseRepo: TicketPurchaseRepository,
     private ticketPurchaseHelper: TicketPurchaseHelper,
     private eventEmitter: EventEmitter2,
+    @Inject(forwardRef(() => TicketPurchaseService ))
     private ticketPurchaseService: TicketPurchaseService,
     private mailSevice: EmailService,
     private eventService: EventService
@@ -24,24 +31,30 @@ export class TicketPurchaseEvents {
 
   private readonly logger = new Logger();
 
-  @OnEvent("ticket.purchase.verified") // TODO: move to a constant or enum
-  async handleTicketPurchaseVerified(payload: PaystackValidationResponse) {
-    console.log("ticket purchase validation event handler called");
+  @OnEvent(TICKET_EVENTS.FREE_TICKET_PURCHASED)
+  async handleFreeTicketPurchase(ticketPaymentRef: string) {
+    this.handleTicketPurchaseVerified({ data: { reference: ticketPaymentRef } });
+  }
 
-    const key = `PURCHASE-${payload.data.reference}`;
+  @OnEvent(TICKET_EVENTS.TICKET_PURCHASE_VERIFIED)
+  async handleTicketPurchaseVerified(payload: Partial<PaystackValidationResponse>) {
+    const { reference } = payload.data;
+    const key = `PURCHASE-${reference}`;
     const ticketPurchaseDetails = (await this.cacheService.get(
       key
     )) as Partial<TicketPurchase>;
 
+    console.log({ ticketPurchaseDetails });
+
     if (!ticketPurchaseDetails) {
       this.logger.log(
-        `INVALID TICKET PURCHASE WITH REFERENCE - ${payload.data.reference}`
+        `INVALID TICKET PURCHASE WITH REFERENCE - ${reference}`
       );
       return;
     }
 
     const ticketPurchaseInDb = await this.ticketPurchaseRepo.findOne("", {
-      paymentRef: payload.data.reference,
+      paymentRef: reference,
     });
 
     if (ticketPurchaseInDb) {
@@ -55,11 +68,11 @@ export class TicketPurchaseEvents {
       this.logger.error("TICKET PURCHASE UPDATE FAILED");
     }
 
-    this.eventEmitter.emit("ticket.purchase.saved", saved.toObject());
-    // await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
+    this.eventEmitter.emit(TICKET_EVENTS.TICKET_PURCHASE_SAVED, saved.toObject());
+    await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
   }
 
-  @OnEvent("ticket.purchase.saved")
+  @OnEvent(TICKET_EVENTS.TICKET_PURCHASE_SAVED)
   async handleTicketPurchaseSaved(payload: Partial<TicketPurchase>) {
     for (const summary of payload.ticketSummary) {
       const tickets = await this.ticketPurchaseHelper.generateTicketData(
@@ -73,7 +86,6 @@ export class TicketPurchaseEvents {
     }
 
     const event = await this.eventService.getEvent(payload.eventId);
-
     await this.ticketPurchaseService.updateTicketPurchase(payload.id, {
       tickets: payload.tickets,
     });

@@ -78,7 +78,7 @@ export class EmailService {
 
     const sent = await this.mailgunService.sendMail({
       message: html,
-      recipients: ["kenovienadu@gmail.com"],
+      recipients: [payload.userEmail],
       isHtml: true,
       subject: "Thanks for your Ticket Purchase - Uzu Ticket",
       sender: "Uzu Tickets <purchases@uzuticket.com>",
@@ -88,15 +88,15 @@ export class EmailService {
   }
 
   async sendTicketToUser(ticketDetails: TicketPurchased) {
-    // if (!ticketDetails.userEmail) {
-    //   return;
-    // }
+    if (!ticketDetails.userEmail) {
+      return;
+    }
 
     const html = await generateTicketEmail(ticketDetails);
 
     const sent = await this.mailgunService.sendMail({
       message: html,
-      recipients: ["kenovienadu@gmail.com"],
+      recipients: [ticketDetails.userEmail],
       isHtml: true,
       subject: `Ticket Details - Uzu Ticket - ${ticketDetails.id}`,
       sender: "Uzu Tickets <purchases@uzuticket.com>",

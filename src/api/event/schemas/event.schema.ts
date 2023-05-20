@@ -1,5 +1,5 @@
-import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Mongoose } from "mongoose";
 import { IEventSchedule } from "src/interfaces";
 import { Timestamp } from "src/utilities";
 import { EventTicket } from "./event-ticket.schema";
@@ -76,7 +76,7 @@ export class Event extends Document {
 export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
-EventSchema.methods.toDto = function () {
+EventSchema.method('toDto', function () {
   const {
     id,
     title,
@@ -111,17 +111,18 @@ EventSchema.methods.toDto = function () {
     author,
     venue,
   };
-};
+})
 
-EventSchema.methods.findTicket = function (ticketId: string): EventTicket {
+
+EventSchema.method('findTicket', function (ticketId: string): EventTicket {
   const { tickets } = this as any;
   const ticket = tickets.find((ticket) =>
     [ticket.id, ticket.name].includes(ticketId)
   );
   return ticket || null;
-};
+});
 
-EventSchema.methods.canBuyTicketAmount = function (
+EventSchema.method('canBuyTicketAmount', function (
   amount: number,
   ticketId: string
 ): boolean {
@@ -134,21 +135,14 @@ EventSchema.methods.canBuyTicketAmount = function (
   }
 
   return available >= amount;
-};
+})
 
-EventSchema.methods.updateTicketSoldCount = async function (
-  amount: number,
-  ticketId: string
-) {
+EventSchema.method('updateTicketCount', async function (amount: number, ticketId: string) {
   const ticket = this.findTicket(ticketId);
-
   const tickets = [...this.tickets];
-
   ticket.nSold = ticket.nSold + amount;
-
   const index = tickets.findIndex((data) => data.id === ticketId);
-
   tickets[index] = ticket;
-  await this.update({ tickets });
+  await this.updateOne({ tickets })
   return true;
-};
+})

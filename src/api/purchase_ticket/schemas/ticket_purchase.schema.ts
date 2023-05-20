@@ -6,7 +6,8 @@ import { EventPurchaseItem } from "../dtos/ticket_purchase.dto";
 export interface TicketPurchased {
   id: string;
   userEmail: string;
-  userFullname: string;
+  userFirstName: string;
+  userLastName: string;
   label: string;
   type: string;
   price: number;
@@ -54,6 +55,12 @@ export class TicketPurchase extends Document {
 
   @Prop()
   userEmail: string;
+
+  @Prop()
+  userFirstName: string;
+
+  @Prop()
+  userLastName: string;
 
   @Prop({ default: null })
   paymentDate: string;
