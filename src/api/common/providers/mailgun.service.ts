@@ -3,6 +3,7 @@ import { SendMailOptions } from "src/interfaces";
 import * as Mailgun from "mailgun-js";
 import { CONFIG } from "src/config";
 
+
 const mailer = Mailgun({
   apiKey: CONFIG.mailgun.apikey,
   domain: CONFIG.mailgun.domain,

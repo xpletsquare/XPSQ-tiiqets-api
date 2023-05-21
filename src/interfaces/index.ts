@@ -26,8 +26,12 @@ export type SendMailOptions = {
   sender?: string;
   subject: string;
   recipients: string[];
-  message: string;
+  message?: string;
   isHtml?: boolean;
+  attachments?: any[];
+  html?: string;
+  body? : string;
+  attachment?: {data: any, filename: string}
 };
 
 export interface PaystackTransactionConfig {
