@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import { removeUnusedImage } from ".";
+import { Injectable } from "@nestjs/common";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,10 +8,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+@Injectable()
 export class CloudinaryHelper {
+
   async uploadPhoto(
     imageLocation: string,
-    type: "photo" | "verificationDocument"
+    type: "photo" | "verificationDocument",
+    filename:string,
   ) {
     try {
       const folder = type === "photo" ? "telbam/images" : "telbam/documents";

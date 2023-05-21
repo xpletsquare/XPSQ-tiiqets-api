@@ -11,6 +11,8 @@ import { generateTicketEmail } from "./inline-templates/ticket.email";
 import { generateUserActivationEmail } from "./inline-templates/userActivation.email";
 import { generateWelcomeEmail } from "./inline-templates/welcome.email";
 
+import MailComposer from "nodemailer/lib/mail-composer";
+
 @Injectable()
 export class EmailService {
   constructor(private mailgunService: MailgunService) {}
@@ -22,7 +24,7 @@ export class EmailService {
       recipients: [user.email],
       isHtml: true,
       subject: "Activate Account - Uzu Ticket",
-      sender: "Uzu Tickets <verify@uzuticket.com>",
+      sender: "Uzu Ticket <verify@uzuticket.com>",
     });
 
     return sent || null;
@@ -39,7 +41,7 @@ export class EmailService {
       recipients: [user.email],
       isHtml: true,
       subject: "Welcome to Uzu Ticket",
-      sender: "Uzu Tickets <welcome@uzuticket.com>",
+      sender: "Uzu Ticket <welcome@uzuticket.com>",
     });
 
     return sent || null;
@@ -52,7 +54,7 @@ export class EmailService {
       recipients: ["kenovienadu@gmail.com"],
       isHtml: true,
       subject: "Login Alert - Uzu Ticket",
-      sender: "Uzu Tickets <alerts@uzuticket.com>",
+      sender: "Uzu Ticket <alerts@uzuticket.com>",
     });
 
     return sent || null;
@@ -74,17 +76,18 @@ export class EmailService {
     eventName: string,
     payload: Partial<TicketPurchase>
   ) {
-    const html = generatePurchaseReceiptEmail(eventName, payload);
-
+    
+    const html = await generatePurchaseReceiptEmail(eventName, payload);
     const sent = await this.mailgunService.sendMail({
       message: html,
       recipients: [payload.userEmail],
       isHtml: true,
       subject: "Thanks for your Ticket Purchase - Uzu Ticket",
-      sender: "Uzu Tickets <purchases@uzuticket.com>",
-    });
+      sender: "Uzu Ticket <purchases@uzuticket.com>",
 
+    });
     return sent || null;
+    // console.log('mail sent')
   }
 
   async sendTicketToUser(ticketDetails: TicketPurchased) {

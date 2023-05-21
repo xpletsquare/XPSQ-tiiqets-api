@@ -32,6 +32,7 @@ export class TicketPurchaseService {
     await this.cacheService.set(key, ticketPurchase);
 
     const userShouldMakePayment = ticketPurchase.cost > NUMBERS.Zero;
+    
     if (userShouldMakePayment) {
       const paystackResponse = await this.paystackService.initiateTransaction(
         ticketPurchase.userEmail,

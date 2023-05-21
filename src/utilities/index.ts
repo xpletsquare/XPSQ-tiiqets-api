@@ -102,6 +102,30 @@ export const getQRCode = async (value): Promise<string> => {
   });
 };
 
+export const getQRCodeToFile = async (value, filename): Promise<string> => {
+  return new Promise((resolve) => {
+    const valueAsString = value;
+    // const valueAsString = JSON.stringify(value);
+
+    const path = "qr/"+filename+".png";
+    // const path = __dirname+"/"+filename+".png";
+    
+    qrcodeReader.toFile(path, valueAsString, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark:"#002D02",
+        light:"#FFFFFF"
+      }
+    }, (err:any) => {
+      if (err) console.log("QR Error: ", err.message || err);
+      resolve(path || null);
+    })
+  
+  });
+
+};
+
 export const getUserCartKey = (userId: string) => `CART-${userId}`;
 
 export const getCartTicketKey = (eventId: string, ticketType: string) =>
