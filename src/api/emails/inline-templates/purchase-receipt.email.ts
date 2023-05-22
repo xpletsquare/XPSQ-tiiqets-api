@@ -31,13 +31,16 @@ const generateTicketPurchaseCategoryRow = (
 
 export const generatePurchaseReceiptEmail = async (
   eventName: string,
-  payload: Partial<TicketPurchase>
+  payload: Partial<TicketPurchase>,
+  eventImage: string,
 ) => {
   const purchaseHTMLRows = generateTicketPurchaseCategoryRow(
     payload.ticketSummary as EventTicketPurchase[]
   );
 
   const totalCost = formatCurrency(payload.cost);
+
+  console.log({payload})
 
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -104,7 +107,7 @@ export const generatePurchaseReceiptEmail = async (
 
         <section class="item-sec" style="max-width: 700px; margin: 0px auto; background-color: white; ">
        
-        <div style="margin-top: 20px; background-color: grey; width: 100%; height: 150px; border-radius: 10px; background-image: url('https://res.cloudinary.com/drof5sggk/image/upload/v1684655029/cld-sample-3.jpg'); background-size: cover;">
+        <div style="margin-top: 20px; background-color: grey; width: 100%; height: 150px; border-radius: 10px; background-image: url('${eventImage}'); background-size: cover;">
 
         </div>
         <div class="message" style="margin: 1em 0;">Thank you for purchasing tickets from Uzu Tickets.</div>

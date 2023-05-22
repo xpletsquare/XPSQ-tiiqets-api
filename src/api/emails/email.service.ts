@@ -12,6 +12,7 @@ import { generateUserActivationEmail } from "./inline-templates/userActivation.e
 import { generateWelcomeEmail } from "./inline-templates/welcome.email";
 
 import MailComposer from "nodemailer/lib/mail-composer";
+import { EventTicketDocument } from "../tickets/schemas/ticket.schema";
 
 @Injectable()
 export class EmailService {
@@ -74,10 +75,12 @@ export class EmailService {
 
   async sendPurchaseConfirmation(
     eventName: string,
-    payload: Partial<TicketPurchase>
+    payload: Partial<TicketPurchase>,
+    eventImage: string,
+    
   ) {
     
-    const html = await generatePurchaseReceiptEmail(eventName, payload);
+    const html = await generatePurchaseReceiptEmail(eventName, payload, eventImage);
     const sent = await this.mailgunService.sendMail({
       message: html,
       recipients: [payload.userEmail],
