@@ -134,7 +134,7 @@ export const generatePurchaseReceiptEmail = async (
           </div>
         </div>
 
-        <div style="margin:10px 0; text-align: center; font-size: 16px; color: grey;">Present this QR code at teh entry to validate your ticket</div>
+        <div style="margin:10px 0; text-align: center; font-size: 16px; color: grey;">Present this QR code at the entry to validate your ticket</div>
     
         <div style="width: 100%; display: flex; justify-content: center;">
           <img src="${imageUrl}" alt="Ticket QR code" style="width: 300px; margin: auto;">
