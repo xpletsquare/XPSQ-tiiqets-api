@@ -90,7 +90,8 @@ export class TicketPurchaseEvents {
       tickets: payload.tickets,
     });
 
-    await this.mailSevice.sendPurchaseConfirmation(event.title, payload);
+    const eventImage = event.image.landscape;
+    await this.mailSevice.sendPurchaseConfirmation(event.title, payload, eventImage);
 
     // payload.tickets.forEach(ticket => {
     //   this.mailSevice.sendTicketToUser(ticket);
