@@ -1,3 +1,4 @@
+import { SchemaFactory } from "@nestjs/mongoose";
 import { IEventSchedule } from "../../../interfaces";
 
 export class EventTicket {
@@ -23,6 +24,8 @@ export class EventTicket {
 
   schedule: string | IEventSchedule; // Uses the scehedule name
 }
+
+export const TicketSchema = SchemaFactory.createForClass(Event);
 
 export class EventTicketPurchase {
   id: string;
