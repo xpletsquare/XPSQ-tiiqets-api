@@ -1,2 +1,2 @@
-# XPSQ Tiqets Backend
+# UZU Ticket Backend
 
