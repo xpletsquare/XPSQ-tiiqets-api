@@ -17,5 +17,10 @@ export class ScannerService {
     const ticket = this.ticketRepository.validateTicket(ticketId);
     return ticket;
   }
+
+  async sendReminder() {
+    // const reminderMail = 
+    return 
+  }
   
 }
