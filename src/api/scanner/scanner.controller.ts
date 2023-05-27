@@ -35,7 +35,7 @@ export class ScannerController {
     return new SuccessResponse("Scanner Loggedin Successfully");
   }
 
-  @Get("check-ticket")
+  @Post("check-ticket")
   async checkTicket(@Body() body: {ticketId?: string, L12TicketId?: string}){
     const ticketDetail = await this.scannerService.getTicketDetail(body.ticketId)
     if(!ticketDetail) return new NotFoundException("Ticket not found")
