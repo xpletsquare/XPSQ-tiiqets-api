@@ -5,6 +5,7 @@ import { TicketPurchaseModule } from "./purchase_ticket/ticket_purchase.module";
 
 import { EventModule } from "./event/event.module";
 import { WalletModule } from "./wallet/wallet.module";
+import { ScannerModule } from "./scanner/scanner.module";
 
 @Module({
   imports: [
@@ -13,6 +14,9 @@ import { WalletModule } from "./wallet/wallet.module";
     EventModule,
     TicketPurchaseModule,
     WalletModule,
+    ScannerModule,
+
+
   ],
 })
 export class ApiModule {}

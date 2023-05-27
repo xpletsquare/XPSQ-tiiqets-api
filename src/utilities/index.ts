@@ -35,6 +35,7 @@ export const verifyAndDecodeJWTToken = (token: string) => {
   }
 };
 
+
 export const passwordMatches = (plainPassword: string, hash: string) => {
   const match = bcrypt.compareSync(plainPassword, hash);
   return match;
@@ -160,3 +161,5 @@ export const getEventStartAndEndDate = (
 
   return [start, end];
 };
+
+export const generateSixDigitCode = () =>  Math.random().toString(36).substring(2,7).toUpperCase();

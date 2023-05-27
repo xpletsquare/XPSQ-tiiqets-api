@@ -15,6 +15,16 @@ export type UserWithResetPin = {
   resetPin: number;
 };
 
+export type IScanner = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  eventCode: string;
+  scannerCode: string;
+  eventId: string;
+
+}
+
 export interface IEventSchedule {
   name: string;
   date: string;

@@ -100,6 +100,7 @@ export class EventRepository {
     return event || null;
   }
 
+
   async findEvents(
     filterQuery: FilterQuery<EventDocument> | null = null,
     limit = 100,
@@ -120,4 +121,6 @@ export class EventRepository {
 
     return data?.deletedCount >= 1;
   }
+
+
 }
