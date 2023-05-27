@@ -114,4 +114,5 @@ export class EventController {
       events.map((event) => event.toDto())
     );
   }
+
 }

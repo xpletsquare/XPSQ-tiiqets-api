@@ -1,8 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
+  Put,
   UseGuards,
 } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
@@ -35,12 +38,15 @@ export class ScannerController {
   @Get("check-ticket")
   async checkTicket(@Body() body: {ticketId?: string, L12TicketId?: string}){
     const ticketDetail = await this.scannerService.getTicketDetail(body.ticketId)
+    if(!ticketDetail) return new NotFoundException("Ticket not found")
     return new SuccessResponse("Ticket Available", ticketDetail)
   }
 
-  @Post("validate-ticket")
+  @Put("validate-ticket")
   async validateTicket(@Body() body: {ticketId: string}) {
-    return new SuccessResponse("Ticket validated")
+    const ticketDetail = await this.scannerService.validateTicket(body.ticketId)
+    if(!ticketDetail) return new BadRequestException("Ticket validation failed")
+    return new SuccessResponse("Ticket Available", ticketDetail)
   }
 
 }
