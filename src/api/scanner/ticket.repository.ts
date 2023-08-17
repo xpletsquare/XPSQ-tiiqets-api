@@ -29,7 +29,7 @@ export class TicketRepository {
 
       if(!ticket) return new NotFoundException("ticket not found");
 
-      // if found, set the status to used : isUsed: true;
+      // if found, set the status to used : isUsed: true;d
       const updatedTicket = await this.ticketPurchase
         .findOne(filterQuery || {id: identifier})
         .exec()
@@ -42,5 +42,7 @@ export class TicketRepository {
       
       return runUpdate?.modifiedCount >= 1;
   }
+
+  
 
 }

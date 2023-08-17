@@ -26,7 +26,7 @@ export class TicketPurchaseEvents {
     @Inject(forwardRef(() => TicketPurchaseService ))
     private ticketPurchaseService: TicketPurchaseService,
     private mailSevice: EmailService,
-    private eventService: EventService
+    private eventService: EventService,
   ) {}
 
   private readonly logger = new Logger();

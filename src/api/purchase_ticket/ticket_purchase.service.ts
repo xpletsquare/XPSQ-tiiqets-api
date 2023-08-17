@@ -85,6 +85,7 @@ export class TicketPurchaseService {
     });
   }
 
+
   async getSingleTicket(idOrReference) {
     const purchase = await this.ticketPurchaseRepo.findOne("", {
       $or: [{ id: idOrReference }, { paymentRef: idOrReference }],
