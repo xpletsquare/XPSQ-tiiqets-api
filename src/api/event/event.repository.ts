@@ -23,6 +23,7 @@ export class EventRepository {
         price: Number(ticket.price),
         nLimit: Number(ticket.nLimit),
         nSold: NUMBERS.Zero,
+        maxPurchases: Number(5),
         id: generateId(),
       };
     });

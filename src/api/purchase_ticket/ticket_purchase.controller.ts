@@ -29,8 +29,12 @@ export class TicketPurchaseController {
   @Get("recents")
   async getRecentTicketPurchases() {
     const purchases = await this.ticketPurchaseService.getTicketPurchases();
+
+    console.log(purchases.length)
     return new SuccessResponse("success", purchases);
   }
+
+  
 
   @UseGuards(LoggedInGuard)
   @Get("event/:eventId")
@@ -59,6 +63,7 @@ export class TicketPurchaseController {
 
   @Get("webhook")
   async paymentWebhook(@Query("txref") txref: string) {
+    console.log({ticketRef: txref })
     await this.ticketPurchaseService.verifyTicketPayment(txref);
     return new SuccessResponse();
   }

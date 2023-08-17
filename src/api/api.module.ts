@@ -6,6 +6,8 @@ import { TicketPurchaseModule } from "./purchase_ticket/ticket_purchase.module";
 import { EventModule } from "./event/event.module";
 import { WalletModule } from "./wallet/wallet.module";
 import { ScannerModule } from "./scanner/scanner.module";
+import { TicketModule } from "./tickets/ticket.module";
+
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { ScannerModule } from "./scanner/scanner.module";
     TicketPurchaseModule,
     WalletModule,
     ScannerModule,
-
+    TicketModule,
 
   ],
 })
