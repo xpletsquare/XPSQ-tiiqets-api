@@ -82,9 +82,9 @@ export class AuthService {
       throw new BadRequestException("Sorry, no user found");
     }
 
-    if (userInCache.activationPin !== dto.otp) {
-      throw new BadRequestException("Incorrect OTP Entered");
-    }
+    // if (userInCache.activationPin !== dto.otp) {
+    //   throw new BadRequestException("Incorrect OTP Entered");
+    // }
 
     const user = await this.userService.saveActivatedUser(
       userInCache.user as CreateUserDTO
