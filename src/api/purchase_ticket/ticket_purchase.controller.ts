@@ -30,7 +30,7 @@ export class TicketPurchaseController {
   async getRecentTicketPurchases() {
     const purchases = await this.ticketPurchaseService.getTicketPurchases();
 
-    console.log(purchases.length)
+    // console.log(purchases.length)
     return new SuccessResponse("success", purchases);
   }
 

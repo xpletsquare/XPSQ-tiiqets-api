@@ -24,6 +24,8 @@ const generateTicketPurchaseCategoryRow = (
   </div>
 
     `;
+
+
   });
 
   return htmlContent;
@@ -40,7 +42,7 @@ export const generatePurchaseReceiptEmail = async (
 
   const totalCost = formatCurrency(payload.cost);
 
-  console.log({payload})
+  console.log({summary : payload.ticketSummary, tickets: payload.tickets})
 
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -48,7 +50,7 @@ export const generatePurchaseReceiptEmail = async (
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
   
-  console.log(payload);
+  // console.log(payload);
   const imagePath = await getQRCodeToFile(payload.id, "qrImage")
 
 
@@ -73,7 +75,6 @@ export const generatePurchaseReceiptEmail = async (
   //     return res;
   //   })
   //   .catch( err => console.log(err));
-
 
   return `
   <!DOCTYPE html>
