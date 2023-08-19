@@ -34,6 +34,7 @@ export class TicketPurchaseService {
     const userShouldMakePayment = ticketPurchase.cost > NUMBERS.Zero;
     
     if (userShouldMakePayment) {
+
       const paystackResponse = await this.paystackService.initiateTransaction(
         ticketPurchase.userEmail,
         ticketPurchase.cost,
@@ -41,6 +42,7 @@ export class TicketPurchaseService {
       );
   
       if (!paystackResponse) {
+        console.log({paystackResponse})
         throw new BadRequestException(
           "Unable to proceed. Please try again later"
         );

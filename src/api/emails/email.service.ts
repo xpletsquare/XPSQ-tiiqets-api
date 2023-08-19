@@ -50,6 +50,8 @@ export class EmailService {
 
   async sendLoginAlert(user) {
     const email = generateLoginAlertEmail(user);
+
+    console.log({emailSide: user})
     const sent = await this.mailgunService.sendMail({
       message: email,
       recipients: ["kenovienadu@gmail.com"],
