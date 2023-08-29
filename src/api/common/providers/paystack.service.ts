@@ -18,12 +18,16 @@ export class PaystackService {
     };
   }
 
+
+
   async initiateTransaction(
     email: string,
     amount: number,
     reference: string | number,
     currency = "NGN"
   ) {
+    console.log({seckey: CONFIG.paystackSecret })
+
     try {
       const payload: PaystackTransactionConfig = {
         amount: amount * 100, // paystack values are in kobo
@@ -33,6 +37,7 @@ export class PaystackService {
         callback_url: CONFIG.paystackCallBackUrl,
       };
 
+      
       const response = await this.httpClient
         .post(
           `${CONFIG.paystackURL}/transaction/initialize`,
@@ -42,7 +47,7 @@ export class PaystackService {
         .toPromise();
       return response?.data;
     } catch (err) {
-      console.log("error: ", err);
+      console.log("paystackError: ", err);
       return null;
     }
   }

@@ -54,7 +54,7 @@ export class EmailService {
     console.log({emailSide: user})
     const sent = await this.mailgunService.sendMail({
       message: email,
-      recipients: ["kenovienadu@gmail.com"],
+      recipients: ["jonesbgabriel@gmail.com"],
       isHtml: true,
       subject: "Login Alert - Uzu Ticket",
       sender: "Uzu Ticket <alerts@uzuticket.com>",
