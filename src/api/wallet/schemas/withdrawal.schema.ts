@@ -7,15 +7,32 @@ export class WithdrawalRequest {
   id: string;
 
   @Prop()
-  userId: string;
+  user: string;
 
   @Prop()
   amount: number;
 
   @Prop()
-  status: "pending" | "approved" | "declined";
+  status: "pending-review" | "pending" | "fulfilled" | "declined" | "failed";
+
+  @Prop()
+  adminHandler: string;
+
+  @Prop()
+  withdrawalReference: string;
+
+  @Prop()
+  statusUpdatedAt: Date;
 }
 
 export const WithdrawalRequestSchema =
   SchemaFactory.createForClass(WithdrawalRequest);
 export type WithdrawalDocument = Document & WithdrawalRequest;
+
+export enum WithdrawalRequestStatus {
+  PENDING_REVIEW = "pending-review",
+  PENDING = "pending",
+  FULFILLED = "fulfilled",
+  DECLINED = "declined",
+  FAILED = "failed"
+}

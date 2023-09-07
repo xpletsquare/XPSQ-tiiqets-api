@@ -8,7 +8,7 @@ import {
   TicketPurchaseRequestDTO,
 } from "./dtos/ticket_purchase.dto";
 import { TicketPurchase } from "./schemas/ticket_purchase.schema";
-import { NUMBERS } from "../../constants";
+import { NUMBERS, FEE_CAP, FEE_RATE, PAYSTACK_FEE } from "../../constants";
 
 @Injectable()
 export class TicketPurchaseHelper {
@@ -98,6 +98,7 @@ export class TicketPurchaseHelper {
       userFirstName: purchaseData.userFirstName,
       userLastName: purchaseData.userLastName,
       promoterCode: purchaseData.promoterCode || null,
+      fee: this.calculateFeeForPurchase(cost)
     };
 
     return ticketPurchase;
@@ -185,5 +186,10 @@ export class TicketPurchaseHelper {
     });
 
     return total;
+  }
+
+  calculateFeeForPurchase(cost: number): number {
+    const fee = (cost * FEE_RATE) + PAYSTACK_FEE;
+    return fee > FEE_CAP ? FEE_CAP : fee;
   }
 }
