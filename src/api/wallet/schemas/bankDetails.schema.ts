@@ -9,14 +9,23 @@ export class BankDetails {
   @Prop()
   user: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   accountNumber: number;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   accountName: string;
+
+  @Prop({ required: true })
+  bankName: string;
+
+  @Prop({ required: true })
+  bankCode: string;
 
   @Prop({ default: "none" })
   accountType: "savings" | "current" | "none";
+
+  @Prop()
+  recipient: string;
 }
 
 export const BankDetailsSchema = SchemaFactory.createForClass(BankDetails);

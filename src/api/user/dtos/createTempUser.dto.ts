@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNumberString, IsString } from "class-validator";
+import { IsEmail, IsNumberString, IsString, Length } from "class-validator";
 
 export class CreateTempUserDTO {
   @ApiProperty()
@@ -16,6 +16,7 @@ export class CreateTempUserDTO {
 
   @ApiProperty()
   @IsNumberString({ message: "invalid phone number" })
+  @Length(11, 13, { message: "phone must not exceed 13 digit or be less than 11 digits"})
   phone: string;
 
   @ApiProperty()

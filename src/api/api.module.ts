@@ -7,6 +7,7 @@ import { EventModule } from "./event/event.module";
 import { WalletModule } from "./wallet/wallet.module";
 import { ScannerModule } from "./scanner/scanner.module";
 import { TicketModule } from "./tickets/ticket.module";
+import { HooksModule } from './hooks/hooks.module';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { TicketModule } from "./tickets/ticket.module";
     WalletModule,
     ScannerModule,
     TicketModule,
-
+    HooksModule
   ],
+  providers: [],
 })
 export class ApiModule {}
