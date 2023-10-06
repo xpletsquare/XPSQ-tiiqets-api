@@ -23,6 +23,11 @@ export class TicketPurchaseService {
   ) {}
 
   async initiatePurchase(dto: TicketPurchaseRequestDTO) {
+
+
+    // console.log(dto)
+
+    // return
     await this.ticketPurchaseHelper.validateTicketPurchases(dto);
     const ticketPurchase = await this.ticketPurchaseHelper.createTempTicketPurchase(dto);
     const response: Record<string, any> = { purchase: ticketPurchase };
@@ -33,9 +38,12 @@ export class TicketPurchaseService {
 
     const userShouldMakePayment = ticketPurchase.cost > NUMBERS.Zero;
     
+    // this is not a free ticket 
+    // this block of code handles payment
     if (userShouldMakePayment) {
 
-      const paystackResponse = await this.paystackService.initiateTransaction(
+      // initiate paystack payment
+      const paystackResponse = await this.paystackService.initiateTransaction( 
         ticketPurchase.userEmail,
         ticketPurchase.cost,
         ticketPurchase.paymentRef
@@ -67,6 +75,7 @@ export class TicketPurchaseService {
   }
 
   async updateTicketPurchase(id: string, updates) {
+    console.log({updates})
     const updated = await this.ticketPurchaseRepo.update(id, { ...updates });
 
     if (!updated) {

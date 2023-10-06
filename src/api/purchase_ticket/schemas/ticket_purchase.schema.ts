@@ -3,6 +3,10 @@ import { Document } from "mongoose";
 import { EventTicketPurchase } from "src/api/event/schemas/event-ticket.schema";
 import { EventPurchaseItem } from "../dtos/ticket_purchase.dto";
 
+export interface Posters {
+  landscape?: string;
+  portrait?: string;
+}
 export interface TicketPurchased {
   id: string;
   userEmail: string;
@@ -15,7 +19,7 @@ export interface TicketPurchased {
   event: {
     id: string;
     title: string;
-    image: string;
+    image?: Posters;
     venue: string;
     date: string;
   };

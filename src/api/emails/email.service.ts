@@ -102,8 +102,9 @@ export class EmailService {
 
     const html = await generateTicketEmail(ticketDetails);
 
+
     const sent = await this.mailgunService.sendMail({
-      message: html,
+      html: html,
       recipients: [ticketDetails.userEmail],
       isHtml: true,
       subject: `Ticket Details - Uzu Ticket - ${ticketDetails.id}`,

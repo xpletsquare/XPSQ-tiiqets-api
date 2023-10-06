@@ -10,6 +10,7 @@ import {
   EventCategorySchema,
 } from "./schemas/event-category.schema";
 import { Event, EventSchema } from "./schemas/event.schema";
+import { CloudinaryHelper } from "src/utilities/cloudinary.service";
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { Event, EventSchema } from "./schemas/event.schema";
     ]),
   ],
   controllers: [EventController, EventCategoryController],
-  providers: [EventService, EventRepository, EventCategoryService],
+  providers: [EventService, EventRepository, EventCategoryService, CloudinaryHelper],
   exports: [EventRepository, EventService, MongooseModule],
 })
 export class EventModule {}

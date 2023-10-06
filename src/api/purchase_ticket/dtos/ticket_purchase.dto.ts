@@ -36,4 +36,5 @@ export interface EventPurchaseItem {
   userEmail: string;
   userFirstName: string;
   userLastName: string;
+  ticketName?: string;
 }

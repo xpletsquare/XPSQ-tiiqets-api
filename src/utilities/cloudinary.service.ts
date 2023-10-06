@@ -32,6 +32,18 @@ export class CloudinaryHelper {
     }
   }
 
+  // stream
+  async streamUpload(){
+    cloudinary.uploader.upload_stream(
+      {
+        folder: 'posters'
+      },
+      function(error, result){
+        console.log(error, result)
+      }
+    )
+  }
+
   async deleteImage(link: string) {
     //
   }
