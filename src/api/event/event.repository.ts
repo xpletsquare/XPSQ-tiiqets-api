@@ -37,7 +37,7 @@ export class EventRepository {
       startDate: firstDate,
       endDate: lastDate,
       image: {
-        landscape: dto.landscapeImage || "",
+        landscape: dto.portraitImage || "",
         portrait: dto.portraitImage || "",
       },
       category: dto.category,

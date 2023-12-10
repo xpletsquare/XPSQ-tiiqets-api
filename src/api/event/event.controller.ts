@@ -22,12 +22,12 @@ import { UpdateEventTicketDTO } from "./dtos/update-event-ticket.dto";
 import { EventRepository } from "./event.repository";
 import { EventService } from "./event.service";
 import { Event } from "./schemas/event.schema";
-import { FileFieldsInterceptor, FileInterceptor } from "@nestjs/platform-express";
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from "@nestjs/platform-express";
 import { CloudinaryHelper } from "src/utilities/cloudinary.service";
 import { createReadStream, createWriteStream } from "fs";
-
-
-
 
 @ApiTags("Events")
 @Controller("events")
@@ -35,40 +35,41 @@ export class EventController {
   constructor(
     private repository: EventRepository,
     private eventService: EventService,
-    private cloudinaryService: CloudinaryHelper,
+    private cloudinaryService: CloudinaryHelper
   ) {}
 
   @UseGuards(LoggedInGuard)
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([
-    {name: 'landscape', maxCount: 1},
-    {name: 'portrait', maxCount: 1},
-  ]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: "landscape", maxCount: 1 },
+      { name: "portrait", maxCount: 1 },
+    ])
+  )
 
   // async createEvent(@Body() body: CreateEventDTO | any ) {
-  async createEvent(@UploadedFiles() files: { landscape?: Express.Multer.File[], portrait?: Express.Multer.File[] } , @Body() body: any ) {
-    const {landscape, portrait} :any = files; // Get uploaded images
+  async createEvent(
+    @UploadedFiles()
+    files: {
+      landscape?: Express.Multer.File[];
+      portrait?: Express.Multer.File[];
+    },
+    @Body() body: any
+  ) {
+    const { landscape }: any = files; // Get uploaded images
     const rest = JSON.parse(body.rest);
-    
-    const [landscapeFile] = landscape;
+    const BufferFile = landscape[0].buffer;
 
+    const fileObj: any = await this.cloudinaryService.streamUpload(BufferFile);
+    // console.log(BufferFile);
+    const img = fileObj?.secure_url;
+    rest.landscapeImage = img;
+    rest.portraitImage = img;
 
-    const bs = createReadStream(JSON.stringify(landscapeFile.buffer));
+    console.log(rest);
 
-    bs.pipe(createWriteStream(__dirname+'/photo.png'));
-    // console.log(bs)
-
-
-    
-    // const isBuffer = Buffer.isBuffer(landscape[0].buffer);
-
-
-
-
-
-
-    return 'success';
-    const event = await this.eventService.createEvent(body);
+    // return "success";
+    const event = await this.eventService.createEvent(rest);
     return new SuccessResponse("Event created successfully", event);
   }
 
@@ -151,5 +152,4 @@ export class EventController {
       events.map((event) => event.toDto())
     );
   }
-
 }
