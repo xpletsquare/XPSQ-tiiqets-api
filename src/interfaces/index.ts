@@ -2,7 +2,7 @@ import { User } from "src/api/user/schemas/user.schema";
 
 export type UserDTO = Pick<
   User,
-  "id" | "email" | "firstName" | "lastName" | "phone" | "flagged" | "activated"
+  "id" | "email" | "firstName" | "lastName" | "phone" | "flagged" | "isAdmin" | "activated"
 >;
 
 export type UserWithActivationPin = {
@@ -87,4 +87,20 @@ export interface PaystackValidationResponse {
       phone: string;
     };
   }>;
+}
+
+export interface PaystackTransferRecipientConfig {
+  type: string;
+  name: string;
+  account_number: string,
+  bank_code: string,
+  currency: string
+}
+
+export interface PaystackInitiateTransferConfig {
+  source: string;
+  amount: number;
+  recipient: string,
+  reference: string,
+  reason: string
 }

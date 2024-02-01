@@ -68,6 +68,9 @@ export class TicketPurchase extends Document {
 
   @Prop({ default: null })
   paymentDate: string;
+
+  @Prop({ default: 0.0 })
+  fee: number;
 }
 
 export type TicketPurchaseDocument = Document & TicketPurchase;

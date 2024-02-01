@@ -34,5 +34,6 @@ import { EmailModule } from "../emails/email.module";
     TicketPurchaseHelper,
     TicketPurchaseEvents,
   ],
+  exports: [TicketPurchaseRepository, TicketPurchaseHelper]
 })
 export class TicketPurchaseModule {}

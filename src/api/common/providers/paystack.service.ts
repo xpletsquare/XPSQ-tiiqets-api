@@ -4,6 +4,8 @@ import { CONFIG } from "src/config";
 import {
   PaystackTransactionConfig,
   PaystackValidationResponse,
+  PaystackTransferRecipientConfig,
+  PaystackInitiateTransferConfig
 } from "src/interfaces";
 
 @Injectable()
@@ -68,5 +70,70 @@ export class PaystackService {
       console.log("error: ", err);
       return null;
     }
+  }
+
+  async listBanks() {
+    const response = await this.httpClient
+    .get(
+      `${CONFIG.paystackURL}/bank?currency=NGN`,
+      this.headers
+    )
+    .toPromise();
+    return response.data;
+  }
+
+  async verifyBank(accountNumber: string, bankCode: string) {
+    const response = await this.httpClient
+    .get(
+      `${CONFIG.paystackURL}/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
+      this.headers
+    )
+    .toPromise();
+    return response.data?.data;
+  }
+
+  async createTransferRecipient(
+    accountNumber: string,
+    bankCode: string,
+    accountName: string
+  ) {
+    const recipientConfig: PaystackTransferRecipientConfig = {
+      account_number: accountNumber,
+      bank_code: bankCode,
+      type: 'nuban',
+      name: accountName,
+      currency: 'NGN'
+    }
+    const response = await this.httpClient
+    .post(
+      `${CONFIG.paystackURL}/transferrecipient`,
+      recipientConfig,
+      this.headers
+    )
+    .toPromise();
+    return response?.data?.data;
+  }
+
+  async initiateTransfer(
+    recipient: string,
+    reason: string,
+    reference: string,
+    amount: number
+  ) {
+    const transactionConfig: PaystackInitiateTransferConfig = {
+      reason,
+      recipient,
+      reference,
+      amount: amount * 100,
+      source: 'balance'
+    }
+    const response = await this.httpClient
+    .post(
+      `${CONFIG.paystackURL}/transfer`,
+      transactionConfig,
+      this.headers
+    )
+    .toPromise();
+    return response?.data?.data;
   }
 }
