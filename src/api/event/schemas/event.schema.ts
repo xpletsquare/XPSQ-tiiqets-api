@@ -76,6 +76,7 @@ export class Event extends Document {
 export type EventDocument = Document & Event;
 export const EventSchema = SchemaFactory.createForClass(Event);
 
+
 EventSchema.method('toDto', function () {
   const {
     id,

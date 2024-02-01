@@ -27,7 +27,7 @@ export class TicketPurchaseHelper {
       );
     }
 
-    const ticketsAreValid = details.purchases.every((purchase) => {
+    const ticketsAreValid = details.purchases.every(purchase => {
       const ticket = event.tickets.find(
         (ticket) => purchase.ticketId === ticket.id
       );
@@ -67,6 +67,9 @@ export class TicketPurchaseHelper {
           name,
           description,
           eventId,
+          userEmail: purchase.userEmail,
+          userFirstName: purchase.userFirstName,
+          userLastName: purchase.userLastName,
           amountToPurchase: purchase.count,
           pricePerUnit: price,
           labels: purchase.labels,
@@ -158,7 +161,9 @@ export class TicketPurchaseHelper {
     for (let index = 0; index < ticketSummary.amountToPurchase; index++) {
       const ticket = {
         id: generateId(),
-        userEmail,
+        userEmail: ticketSummary.userEmail,
+        userFirstName: ticketSummary.userFirstName,
+        userLastName: ticketSummary.userLastName,
         label: labels[index] || "",
         type: ticketSummary.name,
         price: ticketSummary.pricePerUnit,

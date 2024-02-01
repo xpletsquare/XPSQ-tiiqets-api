@@ -1,0 +1,12 @@
+MAILGUN_APIKEY = 04e15e85ce5475b833d5138b093180e9-c485922e-8efb5dd7
+MAILGUN_DOMAIN = mail.odisolead.org
+MAILGUN_HOST = api.eu.mailgun.net
+MONGO_URL = mongodb+srv://xpletsquarehello:QZdFa0mpaDG9cIUd@cluster0.l5oegsx.mongodb.net/?retryWrites=true&w=majority
+PAYSTACK_CALLBACK_URL = http://localhost:25001/payment-success
+PAYSTACK_PUBLIC_KEY = pk_test_9dfa655906ae1c066a38e06807f1bf8b6aed2a18
+PAYSTACK_SECRET_KEY = sk_test_992ce8e89a4495f4c03d716541c52f85db321ed4
+PAYSTACK_URL = https://api.paystack.co
+REDIS_URL = redis://default:yGAW4IrHZCccj0F04EQ6zfEBZIJ1uKbu@redis-10593.c52.us-east-1-4.ec2.cloud.redislabs.com:10593
+CLOUDINARY_CLOUD_NAME = drof5sggk
+CLOUDINARY_API_KEY = 337649371596456
+CLOUDINARY_API_SECRET = jZmwCGOMCzY5qyO4nt27q14fVec

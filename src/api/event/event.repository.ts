@@ -27,6 +27,7 @@ export class EventRepository {
       };
     });
 
+    console.log({ dto });
 
     const eventData: Partial<Event> & { id: string } = {
       id: generateId(),
@@ -36,7 +37,7 @@ export class EventRepository {
       startDate: firstDate,
       endDate: lastDate,
       image: {
-        landscape: dto.landscapeImage || "",
+        landscape: dto.portraitImage || "",
         portrait: dto.portraitImage || "",
       },
       category: dto.category,
@@ -101,7 +102,6 @@ export class EventRepository {
     return event || null;
   }
 
-
   async findEvents(
     filterQuery: FilterQuery<EventDocument> | null = null,
     limit = 100,
@@ -122,6 +122,4 @@ export class EventRepository {
 
     return data?.deletedCount >= 1;
   }
-
-
 }

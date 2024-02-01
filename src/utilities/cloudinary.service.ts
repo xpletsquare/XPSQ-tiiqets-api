@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { removeUnusedImage } from ".";
 import { Injectable } from "@nestjs/common";
+import { Readable } from "stream";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,11 +11,10 @@ cloudinary.config({
 
 @Injectable()
 export class CloudinaryHelper {
-
   async uploadPhoto(
     imageLocation: string,
     type: "photo" | "verificationDocument",
-    filename:string,
+    filename: string
   ) {
     try {
       const folder = type === "photo" ? "telbam/images" : "telbam/documents";
@@ -30,6 +30,25 @@ export class CloudinaryHelper {
       console.log(error);
       return null;
     }
+  }
+
+  // stream
+  async streamUpload(file: Buffer) {
+    return new Promise((res, rej) => {
+      const cstream = cloudinary.uploader.upload_stream(
+        {
+          folder: "posters",
+          stream: true,
+        },
+        function (error, result) {
+          if (error) return rej(error);
+          res(result);
+        }
+      );
+
+      const str = Readable.from(file);
+      str.pipe(cstream);
+    });
   }
 
   async deleteImage(link: string) {

@@ -44,8 +44,6 @@ export class TicketPurchaseEvents {
       key
     )) as Partial<TicketPurchase>;
 
-    console.log({ ticketPurchaseDetails });
-
     if (!ticketPurchaseDetails) {
       this.logger.log(
         `INVALID TICKET PURCHASE WITH REFERENCE - ${reference}`
@@ -74,7 +72,9 @@ export class TicketPurchaseEvents {
 
   @OnEvent(TICKET_EVENTS.TICKET_PURCHASE_SAVED)
   async handleTicketPurchaseSaved(payload: Partial<TicketPurchase>) {
+
     for (const summary of payload.ticketSummary) {
+      console.log({summary})
       const tickets = await this.ticketPurchaseHelper.generateTicketData(
         payload.eventId,
         summary as EventTicketPurchase,
@@ -85,17 +85,23 @@ export class TicketPurchaseEvents {
       payload.tickets = [...payload.tickets, ...tickets];
     }
 
+  
+
     const event = await this.eventService.getEvent(payload.eventId);
     await this.ticketPurchaseService.updateTicketPurchase(payload.id, {
       tickets: payload.tickets,
     });
 
+    
+
     const eventImage = event.image.landscape;
     await this.mailSevice.sendPurchaseConfirmation(event.title, payload, eventImage);
 
-    // payload.tickets.forEach(ticket => {
-    //   this.mailSevice.sendTicketToUser(ticket);
-    // })
+    // send tickets to each user
+    payload.tickets.forEach(ticket => {
+      console.log({myTicket: ticket})
+      this.mailSevice.sendTicketToUser(ticket);
+    })
 
     if (payload.promoterCode) {
       this.eventEmitter.emit("event.promotion.credit", {

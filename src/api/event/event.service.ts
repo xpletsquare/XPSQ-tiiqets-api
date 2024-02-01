@@ -42,6 +42,9 @@ export class EventService {
   }
 
   async createEvent(details: CreateEventDTO) {
+    console.log({ details });
+
+    // return 'success'
     if (!details.schedules.length) {
       throw new BadRequestException("Please add one or more schedules");
     }

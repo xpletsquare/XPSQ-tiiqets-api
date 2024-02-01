@@ -41,6 +41,12 @@ export class EventTicketPurchase {
   amountToPurchase: number;
 
   labels: string[];
+
+  userEmail?: string;
+
+  userFirstName?: string;
+
+  userLastName?: string;
 }
 
 export class EventTicketUpdate {
