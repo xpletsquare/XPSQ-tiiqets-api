@@ -23,21 +23,25 @@ export class TicketPurchaseEvents {
     private ticketPurchaseRepo: TicketPurchaseRepository,
     private ticketPurchaseHelper: TicketPurchaseHelper,
     private eventEmitter: EventEmitter2,
-    @Inject(forwardRef(() => TicketPurchaseService ))
+    @Inject(forwardRef(() => TicketPurchaseService))
     private ticketPurchaseService: TicketPurchaseService,
     private mailSevice: EmailService,
-    private eventService: EventService,
+    private eventService: EventService
   ) {}
 
   private readonly logger = new Logger();
 
   @OnEvent(TICKET_EVENTS.FREE_TICKET_PURCHASED)
   async handleFreeTicketPurchase(ticketPaymentRef: string) {
-    this.handleTicketPurchaseVerified({ data: { reference: ticketPaymentRef } });
+    this.handleTicketPurchaseVerified({
+      data: { reference: ticketPaymentRef },
+    });
   }
 
   @OnEvent(TICKET_EVENTS.TICKET_PURCHASE_VERIFIED)
-  async handleTicketPurchaseVerified(payload: Partial<PaystackValidationResponse>) {
+  async handleTicketPurchaseVerified(
+    payload: Partial<PaystackValidationResponse>
+  ) {
     const { reference } = payload.data;
     const key = `PURCHASE-${reference}`;
     const ticketPurchaseDetails = (await this.cacheService.get(
@@ -45,9 +49,7 @@ export class TicketPurchaseEvents {
     )) as Partial<TicketPurchase>;
 
     if (!ticketPurchaseDetails) {
-      this.logger.log(
-        `INVALID TICKET PURCHASE WITH REFERENCE - ${reference}`
-      );
+      this.logger.log(`INVALID TICKET PURCHASE WITH REFERENCE - ${reference}`);
       return;
     }
 
@@ -66,15 +68,16 @@ export class TicketPurchaseEvents {
       this.logger.error("TICKET PURCHASE UPDATE FAILED");
     }
 
-    this.eventEmitter.emit(TICKET_EVENTS.TICKET_PURCHASE_SAVED, saved.toObject());
+    this.eventEmitter.emit(
+      TICKET_EVENTS.TICKET_PURCHASE_SAVED,
+      saved.toObject()
+    );
     await this.cacheService.del(`PURCHASE-${payload.data.reference}`);
   }
 
   @OnEvent(TICKET_EVENTS.TICKET_PURCHASE_SAVED)
   async handleTicketPurchaseSaved(payload: Partial<TicketPurchase>) {
-
     for (const summary of payload.ticketSummary) {
-      console.log({summary})
       const tickets = await this.ticketPurchaseHelper.generateTicketData(
         payload.eventId,
         summary as EventTicketPurchase,
@@ -85,23 +88,31 @@ export class TicketPurchaseEvents {
       payload.tickets = [...payload.tickets, ...tickets];
     }
 
-  
-
     const event = await this.eventService.getEvent(payload.eventId);
     await this.ticketPurchaseService.updateTicketPurchase(payload.id, {
       tickets: payload.tickets,
     });
 
-    
-
+    // send the purchase receipt to the recipient
     const eventImage = event.image.landscape;
-    await this.mailSevice.sendPurchaseConfirmation(event.title, payload, eventImage);
+    await this.mailSevice.sendPurchaseConfirmation(
+      event.title,
+      payload,
+      eventImage,
+      false
+    );
 
-    // send tickets to each user
-    payload.tickets.forEach(ticket => {
-      console.log({myTicket: ticket})
+    if (!payload.tickets[0].userEmail) {
+      this.mailSevice.sendPurchaseConfirmation(
+        event.title,
+        payload,
+        eventImage,
+        true
+      );
+    }
+    payload.tickets.forEach((ticket) => {
       this.mailSevice.sendTicketToUser(ticket);
-    })
+    });
 
     if (payload.promoterCode) {
       this.eventEmitter.emit("event.promotion.credit", {

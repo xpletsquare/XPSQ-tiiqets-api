@@ -23,13 +23,10 @@ export class TicketPurchaseService {
   ) {}
 
   async initiatePurchase(dto: TicketPurchaseRequestDTO) {
-
-
-    // console.log(dto)
-
     // return
     await this.ticketPurchaseHelper.validateTicketPurchases(dto);
-    const ticketPurchase = await this.ticketPurchaseHelper.createTempTicketPurchase(dto);
+    const ticketPurchase =
+      await this.ticketPurchaseHelper.createTempTicketPurchase(dto);
     const response: Record<string, any> = { purchase: ticketPurchase };
 
     // save ticket purchase to redis
@@ -37,20 +34,19 @@ export class TicketPurchaseService {
     await this.cacheService.set(key, ticketPurchase);
 
     const userShouldMakePayment = ticketPurchase.cost > NUMBERS.Zero;
-    
-    // this is not a free ticket 
+
+    // this is not a free ticket
     // this block of code handles payment
     if (userShouldMakePayment) {
-
       // initiate paystack payment
-      const paystackResponse = await this.paystackService.initiateTransaction( 
+      const paystackResponse = await this.paystackService.initiateTransaction(
         ticketPurchase.userEmail,
         ticketPurchase.cost,
         ticketPurchase.paymentRef
       );
-  
+
       if (!paystackResponse) {
-        console.log({paystackResponse})
+        console.log({ paystackResponse });
         throw new BadRequestException(
           "Unable to proceed. Please try again later"
         );
@@ -58,7 +54,10 @@ export class TicketPurchaseService {
 
       response.payment = paystackResponse; // send payment data along with event data
     } else {
-      this.eventEmitter.emit(TICKET_EVENTS.FREE_TICKET_PURCHASED, ticketPurchase.paymentRef);
+      this.eventEmitter.emit(
+        TICKET_EVENTS.FREE_TICKET_PURCHASED,
+        ticketPurchase.paymentRef
+      );
     }
 
     return response;
@@ -75,7 +74,7 @@ export class TicketPurchaseService {
   }
 
   async updateTicketPurchase(id: string, updates) {
-    console.log({updates})
+    console.log({ updates });
     const updated = await this.ticketPurchaseRepo.update(id, { ...updates });
 
     if (!updated) {
@@ -89,13 +88,12 @@ export class TicketPurchaseService {
   async getTicketPurchases(query = {}) {
     const purchases = await this.ticketPurchaseRepo.find({
       ...query,
-    })
+    });
     return purchases.map((purchase) => {
       const { tickets, _id, __v, ...rest } = purchase.toObject();
       return rest;
     });
   }
-
 
   async getSingleTicket(idOrReference) {
     const purchase = await this.ticketPurchaseRepo.findOne("", {
