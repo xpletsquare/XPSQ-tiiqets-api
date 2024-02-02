@@ -77,17 +77,22 @@ export class EmailService {
     eventName: string,
     payload: Partial<TicketPurchase>,
     eventImage: string,
-    
+    isTicket: boolean
   ) {
-    
-    const html = await generatePurchaseReceiptEmail(eventName, payload, eventImage);
+    const html = await generatePurchaseReceiptEmail(
+      eventName,
+      payload,
+      eventImage,
+      isTicket
+    );
     const sent = await this.mailgunService.sendMail({
       message: html,
-      recipients: [payload.userEmail],
+      recipients: [payload?.userEmail],
       isHtml: true,
-      subject: "Thanks for your Ticket Purchase - Uzu Ticket",
+      subject: isTicket
+        ? `${eventName} Ticket Details `
+        : `Thanks for your Ticket Purchase - Uzu Ticket`,
       sender: "Uzu Ticket <purchases@uzuticket.com>",
-
     });
     return sent || null;
     // console.log('mail sent')
@@ -100,13 +105,12 @@ export class EmailService {
 
     const html = await generateTicketEmail(ticketDetails);
 
-
     const sent = await this.mailgunService.sendMail({
-      html: html,
-      recipients: [ticketDetails.userEmail],
+      message: html,
+      recipients: [ticketDetails?.userEmail],
       isHtml: true,
-      subject: `Ticket Details - Uzu Ticket - ${ticketDetails.id}`,
-      sender: "Uzu Tickets <purchases@uzuticket.com>",
+      subject: `${ticketDetails?.event?.title} Ticket Details `,
+      sender: "Uzu Tickets <ticket@uzuticket.com>",
     });
 
     return sent || null;

@@ -1,9 +1,7 @@
 import { EventTicketPurchase } from "src/api/event/schemas/event-ticket.schema";
 import { TicketPurchase } from "src/api/purchase_ticket/schemas/ticket_purchase.schema";
 import { formatCurrency, getQRCode, getQRCodeToFile } from "../../../utilities";
-import {v2 as cloudinary} from 'cloudinary';
-
-
+import { v2 as cloudinary } from "cloudinary";
 
 const generateTicketPurchaseCategoryRow = (
   purchaseSummary: EventTicketPurchase[]
@@ -54,8 +52,6 @@ const generateTicketPurchaseCategoryRow = (
 
 
     `;
-
-
   });
 
   return purchaseItem;
@@ -65,6 +61,7 @@ export const generatePurchaseReceiptEmail = async (
   eventName: string,
   payload: Partial<TicketPurchase>,
   eventImage: string,
+  isTicket: boolean
 ) => {
   const purchaseHTMLRows = generateTicketPurchaseCategoryRow(
     payload.ticketSummary as EventTicketPurchase[]
@@ -72,40 +69,26 @@ export const generatePurchaseReceiptEmail = async (
 
   const totalCost = formatCurrency(payload.cost);
 
-
-
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
-  
-  // console.log(payload);
-  const imagePath = await getQRCodeToFile(payload.id, "qrImage")
 
+  // console.log(payload);
+  const imagePath = await getQRCodeToFile(payload.id, "qrImage");
 
   const imageUrl = await cloudinary.uploader
     .upload(imagePath, {
       folder: "qrcode",
       use_filename: false,
     })
-    .then(result=>{
+    .then((result) => {
       return result.url;
     })
-    .catch(err => console.log({err}));
+    .catch((err) => console.log({ err }));
 
-    // console.log(imagePath, imageUrl)
-
-  // generate qr code
- 
-  // const qr = getQRCode("uzu tickets")
-  //   .then( res => {
-  //     console.log(res);
-  //     return res;
-  //   })
-  //   .catch( err => console.log(err));
-  
-    return `
+  return `
     <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -149,12 +132,25 @@ export const generatePurchaseReceiptEmail = async (
                                 <tr valign="middle" style="border:none;margin:0px;padding:0px">
                                     <td width="6.25%" valign="middle" style="border:none;margin:0px;padding:0px;width:6.25%"></td>
                                     <td valign="middle" style="border:none;margin:0px;padding:0px">
-                                        <h2 align="center" style="border:none;margin:0px;padding:0px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;text-decoration:none;color:rgb(85,85,85);font-size:30px;font-weight:bold;line-height:45px;letter-spacing:-0.04em;text-align:center">
+                                       ${
+                                         isTicket
+                                           ? `
+                                       
+                                       <h2 align="center" style="border:none;margin:0px;padding:0px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;text-decoration:none;color:rgb(85,85,85);font-size:30px;font-weight:bold;line-height:45px;letter-spacing:-0.04em;text-align:center">
                                                 
+  
+                                       <span class="il">Hello ${payload.userFirstName}, </span>
+
+                                   </h2>
+
+                                   <h4 align="center">Your ticket is here.</h4>
+                                       `
+                                           : `<h2 align="center" style="border:none;margin:0px;padding:0px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;text-decoration:none;color:rgb(85,85,85);font-size:30px;font-weight:bold;line-height:45px;letter-spacing:-0.04em;text-align:center">         
   
   Your <span class="il">Uzu Ticket</span> Purchase receipt
 
-                                        </h2>
+                                        </h2>`
+                                       }
                                     </td>
                                     <td width="6.25%" valign="middle" style="border:none;margin:0px;padding:0px;width:6.25%"></td>
                                 </tr>
@@ -168,6 +164,25 @@ export const generatePurchaseReceiptEmail = async (
                                 <tr valign="middle" style="border:none;margin:0px;padding:0px">
                                     <td width="6.25%" valign="middle" style="width:6.25%;border:none;margin:0px;padding:0px"></td>
                                     <td valign="middle" style="border:none;margin:0px;padding:0px">
+
+
+                                   ${
+                                     isTicket &&
+                                     `     <table cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0px;padding:0px">
+                                            <tbody>
+                                                <tr>
+                                                    <td align="left" style="border:none;margin:0px;padding:0px 0px 5px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:200;text-align:left;text-decoration:none;color:rgb(97,100,103);font-size:14px;line-height:20px">
+                                                        <center style="border:none;margin:0px;padding:0px">
+                                                            <img src=${imageUrl} alt="ticket QR/>
+                                                          <center style="border:none;margin:0px;padding:0px"></center>
+                                                        </center>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>`
+                                   }
+
+                                        
                                         <table cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0px;padding:0px">
                                             <tbody>
                                                 <tr>
@@ -185,7 +200,9 @@ export const generatePurchaseReceiptEmail = async (
                                                 <tr>
                                                     <td align="left" style="border:none;margin:0px;padding:0px 0px 5px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:200;text-align:left;text-decoration:none;color:rgb(97,100,103);font-size:14px;line-height:20px">
                                                         <center style="border:none;margin:0px;padding:0px">
-                                                          Purchase Ref: ${payload.paymentRef}
+                                                          Purchase Ref: ${
+                                                            payload.paymentRef
+                                                          }
                                                           <center style="border:none;margin:0px;padding:0px"></center>
                                                         </center>
                                                     </td>
@@ -214,9 +231,7 @@ export const generatePurchaseReceiptEmail = async (
                                                              
 
                             <!-- item -->
-                              ${
-                                purchaseHTMLRows
-                              }
+                              ${purchaseHTMLRows}
                             <!-- end of item -->
 
 
@@ -295,9 +310,14 @@ export const generatePurchaseReceiptEmail = async (
                                     <tbody width="100%" cellpadding="0" cellspacing="0" style="border: none; padding: 0px; margin: 0px;">
                                       <tr>
                                         <td width="30%">
-                                          <img width="100%" alt="banner" src="${payload.tickets[0]?.event?.image?.landscape}" />
+                                          <img width="100%" alt="banner" src="${
+                                            payload.tickets[0]?.event?.image
+                                              ?.landscape
+                                          }" />
                                         </td>
-                                        <td width="70%" style="padding-right: 20px; padding-left:10px;"> <h3 style="font-weight: bold; font-size: 18px; line-height: 28px;">${payload.tickets[0]?.event?.title}</h3></td>
+                                        <td width="70%" style="padding-right: 20px; padding-left:10px;"> <h3 style="font-weight: bold; font-size: 18px; line-height: 28px;">${
+                                          payload.tickets[0]?.event?.title
+                                        }</h3></td>
                                       </tr>
                                     </tbody>
                                   </table>
@@ -329,7 +349,11 @@ export const generatePurchaseReceiptEmail = async (
                                                 <tr>
                                                     <td align="left" style="border:none;margin:0px;padding:0px 0px 5px;font-family:Circular,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:200;text-align:left;text-decoration:none;color:rgb(97,100,103);font-size:14px;line-height:20px">
                                                         <center style="border:none;margin:0px;padding:0px"> 
-                                                        ${payload.userFirstName}  ${payload.userLastName} | ${payload.userEmail} 
+                                                        ${
+                                                          payload.userFirstName
+                                                        }  ${
+    payload.userLastName
+  } | ${payload.userEmail} 
                                                         </center>
                                                     </td>
                                                 </tr>
@@ -370,7 +394,9 @@ export const generatePurchaseReceiptEmail = async (
 
                                 <tr>
                                   <td width="6.25%" style="width: 6.25%;"></td>
-                                  <td color="#C1C1C1" style="color: rgb(182, 182, 182);">This email was intended for ${payload.userEmail}.com. If you received this by mistake or have any questions, please reach out to us on support@uzutickets.com.</td>
+                                  <td color="#C1C1C1" style="color: rgb(182, 182, 182);">This email was intended for ${
+                                    payload.userEmail
+                                  }.com. If you received this by mistake or have any questions, please reach out to us on support@uzuticket.com.</td>
                                   <td width="6.25%" style="width: 6.25%;"></td>
                                 </tr>
                                 <!-- end of footer message -->
@@ -448,5 +474,4 @@ export const generatePurchaseReceiptEmail = async (
 </body>
 </html>
     `;
-    
 };
