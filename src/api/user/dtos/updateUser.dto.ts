@@ -1,10 +1,9 @@
 import { IsOptional, IsString } from "class-validator";
 
 export class UpdateUserDTO {
-
   @IsString()
   @IsOptional()
-  hashedPassword?: string
+  password?: string;
 
   @IsString()
   @IsOptional()

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { TWENTY_FOUR_HOURS } from "src/constants";
 import { getUserCartKey } from "src/utilities";
 import { CacheService } from "../common/providers/cache.service";
@@ -7,12 +11,10 @@ import { Cart, CartItem, CartDTO } from "./models/cart.model";
 
 @Injectable()
 export class CartService {
-
   constructor(
     private eventService: MockEventService,
-    private cacheService: CacheService,
-  ) { }
-
+    private cacheService: CacheService
+  ) {}
 
   async saveUserCart(userId: string, cart: Cart) {
     const cartKey = getUserCartKey(userId);
@@ -20,11 +22,11 @@ export class CartService {
   }
 
   async getUserCart(userId: string, asDTO = true) {
-    const userCartKey = getUserCartKey(userId)
-    const cart = await this.cacheService.get(userCartKey) as Cart
+    const userCartKey = getUserCartKey(userId);
+    const cart = (await this.cacheService.get(userCartKey)) as Cart;
 
     if (!cart) {
-      throw new NotFoundException('No cart found for user');
+      throw new NotFoundException("No cart found for user");
     }
 
     const data = asDTO ? this.transformCartToDTO(cart) : cart;
@@ -35,31 +37,39 @@ export class CartService {
   }
 
   // ownerId, eventId, ticketId, quantity
-  async addTicketToCart(ownerId: string, eventId: string, ticketType: string, quantity: number) {
+  async addTicketToCart(
+    ownerId: string,
+    eventId: string,
+    ticketType: string,
+    quantity: number
+  ) {
     let cart: Cart | null = null;
 
-    const userCartKey = getUserCartKey(ownerId)
-    cart = await this.cacheService.get(userCartKey) as Cart
+    const userCartKey = getUserCartKey(ownerId);
+    cart = (await this.cacheService.get(userCartKey)) as Cart;
 
-    const ticketDetails = await this.eventService.getEventTicketDetails(ticketType, eventId);
+    const ticketDetails = await this.eventService.getEventTicketDetails(
+      ticketType,
+      eventId
+    );
 
     if (!ticketDetails) {
-      throw new BadRequestException('Invalid Ticket for Event');
+      throw new BadRequestException("Invalid Ticket for Event");
     }
 
     const cartItem: CartItem = {
       id: ticketDetails.id,
       price: ticketDetails.price,
       quantity: quantity,
-      name: ticketDetails.name
-    }
+      name: ticketDetails.name,
+    };
 
     if (!cart) {
       cart = {
         ownerId,
         total: 0,
-        items: new Map()
-      }
+        items: new Map(),
+      };
     }
 
     const itemInCart = cart.items.get(cartItem.id);
@@ -69,48 +79,47 @@ export class CartService {
     }
 
     cart.items.set(cartItem.id, cartItem); // Add to cart if not existing in cart
-    cart.total = this.getCartTotal([cartItem])
+    cart.total = this.getCartTotal([cartItem]);
 
     await this.saveUserCart(ownerId, cart);
 
     return this.transformCartToDTO(cart);
   }
 
-  async removeTicketFromCart(ownerId: string, eventId: string, ticketType: string) {
+  async removeTicketFromCart(
+    ownerId: string,
+    eventId: string,
+    ticketType: string
+  ) {
     // const cart = await this.getUserCart(ownerId, false) as Cart;
-
     // const itemIsInCart = cart.items.has(productId);
-
     // if (!itemIsInCart) {
     //   throw new BadRequestException('Item is not in users cart');
     // }
-
     // cart.items.delete(productId);
     // await this.saveUserCart(ownerId, cart);
-
     // return this.transformCartToDTO(cart);
   }
 
-  async modifyItemQuantity(ownerId: string, eventId: string, ticketType: string, quantity: number) {
+  async modifyItemQuantity(
+    ownerId: string,
+    eventId: string,
+    ticketType: string,
+    quantity: number
+  ) {
     // console.log('DEBUG', ownerId);
     // let userCart = await this.getUserCart(ownerId, false) as Cart;
-
     // const item = userCart.items.get(productId);
-
     // if (!item) {
     //   throw new BadRequestException('Item is not in cart');
     // }
-
     // if (quantity === 0) {
     //   const cartDTO = await this.removeCartItem(ownerId, productId);
     //   return cartDTO;
     // }
-
     // item.quantity = quantity;
     // userCart.items.set(productId, item);
-
     // await this.saveUserCart(ownerId, userCart);
-
     // return this.transformCartToDTO(userCart);
   }
 
@@ -118,7 +127,7 @@ export class CartService {
     const cart = await this.getUserCart(ownerId);
 
     if (!cart) {
-      throw new BadRequestException('Invalid Cart')
+      throw new BadRequestException("Invalid Cart");
     }
 
     // TODO: initiate payment and get payment link
@@ -138,14 +147,14 @@ export class CartService {
       items,
       total,
       ownerId: cart.ownerId,
-    }
+    };
   }
 
   getCartTotal(items: CartItem[]) {
     let total = 0;
 
     for (const item of items) {
-      total += (item.price * item.quantity)
+      total += item.price * item.quantity;
     }
 
     return total;

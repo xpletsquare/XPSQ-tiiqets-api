@@ -1,46 +1,69 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { throwHttpError } from 'src/utilities/errorMessage';
-import { SuccessResponse } from 'src/utilities/successMessage';
-import { TicketPurchaseRequestDTO } from './dtos/ticket_purchase.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { TicketPurchaseService } from './ticket_purchase.service';
-import { LoggedInGuard } from '../authentication/guards/loggedIn.guard';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import { SuccessResponse } from "src/utilities/successMessage";
+import { TicketPurchaseRequestDTO } from "./dtos/ticket_purchase.dto";
+import { ApiTags } from "@nestjs/swagger";
+import { TicketPurchaseService } from "./ticket_purchase.service";
+import { LoggedInGuard } from "../authentication/guards/loggedIn.guard";
+import { AdminGuard } from "../authentication/guards/admin.guard";
 
-@ApiTags('Purchases')
-@Controller('purchase-tickets')
+@ApiTags("Purchases")
+@Controller("purchase-tickets")
 export class TicketPurchaseController {
-  constructor(
-    private ticketPurchaseService: TicketPurchaseService
-  ) {}
+  constructor(private ticketPurchaseService: TicketPurchaseService) {}
 
-  @Post('initiate')
+  @Post("initiate")
   async initiatePurchase(@Body() body: TicketPurchaseRequestDTO) {
     const data = await this.ticketPurchaseService.initiatePurchase(body);
-    return new SuccessResponse('success', data);
+    return new SuccessResponse("success", data);
   }
 
-  @UseGuards(LoggedInGuard)
-  @Get('recents')
+  @UseGuards(AdminGuard)
+  @Get("recents")
   async getRecentTicketPurchases() {
     const purchases = await this.ticketPurchaseService.getTicketPurchases();
-    return new SuccessResponse('success', purchases);
+
+    // console.log(purchases.length)
+    return new SuccessResponse("success", purchases);
   }
+
+  
 
   @UseGuards(LoggedInGuard)
-  @Get('event/:eventId')
-  async getEventTicketPurchases(@Param('eventId') eventId: string) {
-    const purchases = await this.ticketPurchaseService.getTicketPurchases({ eventId });
-    return new SuccessResponse('success', purchases);
+  @Get("event/:eventId")
+  async getEventTicketPurchases(@Param("eventId") eventId: string) {
+    const purchases = await this.ticketPurchaseService.getTicketPurchases({
+      eventId,
+    });
+    return new SuccessResponse("success", purchases);
   }
 
-  @Get('single/:idOrReference')
-  async getSinglePurchase(@Param('idOrReference') idOrReference: string) {
-    const purchase = await this.ticketPurchaseService.getSingleTicket(idOrReference);
-    return new SuccessResponse('success', purchase);
+  @Get("single/:idOrReference")
+  async getSinglePurchase(@Param("idOrReference") idOrReference: string) {
+    const purchase = await this.ticketPurchaseService.getSingleTicket(
+      idOrReference
+    );
+    return new SuccessResponse("success", purchase);
   }
 
-  @Get('webhook')
-  async paymentWebhook(@Query('txref') txref: string) {
+  @Get("summary/:eventId")
+  async getPurchaseSummary(@Param("eventId") eventId: string) {
+    const summary = await this.ticketPurchaseService.getPurchaseSummaryForEvent(
+      eventId
+    );
+    return new SuccessResponse("success", summary);
+  }
+
+  @Get("webhook")
+  async paymentWebhook(@Query("txref") txref: string) {
+    console.log({ticketRef: txref })
     await this.ticketPurchaseService.verifyTicketPayment(txref);
     return new SuccessResponse();
   }

@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 
-
 @Injectable()
 export class MockEventService {
   async verifyTicket(ticketId: string, eventId: string) {
@@ -8,15 +7,15 @@ export class MockEventService {
   }
 
   async getEventTicketDetails(ticketId: string, eventId: string) {
-    if (eventId !== 'test') {
+    if (eventId !== "test") {
       return null;
     }
 
     return {
       id: ticketId,
-      name: 'regular',
+      name: "regular",
       price: 3000,
-      availableTickets: 1000
-    }
+      availableTickets: 1000,
+    };
   }
 }

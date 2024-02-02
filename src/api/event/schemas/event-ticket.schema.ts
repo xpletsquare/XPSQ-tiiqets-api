@@ -1,27 +1,33 @@
-
+import { SchemaFactory } from "@nestjs/mongoose";
+import { IEventSchedule } from "../../../interfaces";
 
 export class EventTicket {
-
   id: string;
 
   eventId: string;
 
   name: string;
 
+  title?: string;
+
   description: string;
 
   price: number;
 
-  availableTickets: number;
+  nLimit: number;
 
-  maxPossiblePurchases: number
+  nSold: number;
+
+  maxPurchases: number;
 
   endSalesAt: number;
 
+  schedule: string | IEventSchedule; // Uses the scehedule name
 }
 
-export class EventTicketPurchase {
+export const TicketSchema = SchemaFactory.createForClass(Event);
 
+export class EventTicketPurchase {
   id: string;
 
   eventId: string;
@@ -32,10 +38,15 @@ export class EventTicketPurchase {
 
   pricePerUnit: number;
 
-  amountToPurchase: number
+  amountToPurchase: number;
 
-  labels: string[]
+  labels: string[];
 
+  userEmail?: string;
+
+  userFirstName?: string;
+
+  userLastName?: string;
 }
 
 export class EventTicketUpdate {

@@ -1,24 +1,21 @@
 import { Controller, Get, Post } from "@nestjs/common";
 import { SuccessResponse } from "src/utilities/successMessage";
 
-
-
-@Controller('admin')
+@Controller("admin")
 export class AdminController {
-
-  @Get('list')
+  @Get("list")
   async listAdmins() {
-    return new SuccessResponse('success', []);
+    return new SuccessResponse("success", []);
   }
 
-  @Post('new')
+  @Post("new")
   async addAdmin() {
-    return new SuccessResponse('success', []);
+    return new SuccessResponse("success", []);
   }
 
-  @Post('block-user')
+  @Post("block-user")
   async blockUser() {
-    return new SuccessResponse('success', []);
+    return new SuccessResponse("success", []);
   }
 
   // Admin can approve withdrawals

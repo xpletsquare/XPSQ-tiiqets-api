@@ -1,19 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { UserDTO } from "src/interfaces";
 import { MailgunService } from "../common/providers/mailgun.service";
-import { TicketPurchase, TicketPurchased } from "../purchase_ticket/schemas/ticket_purchase.schema";
+import {
+  TicketPurchase,
+  TicketPurchased,
+} from "../purchase_ticket/schemas/ticket_purchase.schema";
 import { generateLoginAlertEmail } from "./inline-templates/login.email";
 import { generatePurchaseReceiptEmail } from "./inline-templates/purchase-receipt.email";
 import { generateTicketEmail } from "./inline-templates/ticket.email";
 import { generateUserActivationEmail } from "./inline-templates/userActivation.email";
 import { generateWelcomeEmail } from "./inline-templates/welcome.email";
 
+import MailComposer from "nodemailer/lib/mail-composer";
+import { EventTicketDocument } from "../tickets/schemas/ticket.schema";
 
 @Injectable()
 export class EmailService {
-  constructor(
-    private mailgunService: MailgunService
-  ) { }
+  constructor(private mailgunService: MailgunService) {}
 
   async sendActivationOTP(user: UserDTO, otp: number) {
     const email = generateUserActivationEmail(user, otp);
@@ -21,14 +24,16 @@ export class EmailService {
       message: email,
       recipients: [user.email],
       isHtml: true,
-      subject: 'Activate Account - XPSQ Tickets',
-      sender: 'Uzu Tickets <verify@uzutickets.com>'
-    })
+      subject: "Activate Account - Uzu Ticket",
+      sender: "Uzu Ticket <verify@uzuticket.com>",
+    });
 
     return sent || null;
   }
 
-  async sendActivationSuccess(firstName: string, email: string) { }
+  async sendActivationSuccess(firstName: string, email: string) {
+    //
+  }
 
   async sendWelcomeEmail(user) {
     const email = generateWelcomeEmail(user);
@@ -36,9 +41,9 @@ export class EmailService {
       message: email,
       recipients: [user.email],
       isHtml: true,
-      subject: 'Welcome to XPSQ - XPSQ',
-      sender: 'Uzu Tickets <welcome@uzutickets.com>'
-    })
+      subject: "Welcome to Uzu Ticket",
+      sender: "Uzu Ticket <welcome@uzuticket.com>",
+    });
 
     return sent || null;
   }
@@ -47,47 +52,66 @@ export class EmailService {
     const email = generateLoginAlertEmail(user);
     const sent = await this.mailgunService.sendMail({
       message: email,
-      recipients: ['kenovienadu@gmail.com'],
+      recipients: ["jonesbgabriel@gmail.com"],
       isHtml: true,
-      subject: 'Login Alert - XPSQ',
-      sender: 'Uzu Tickets <alerts@uzutickets.com>'
-    })
+      subject: "Login Alert - Uzu Ticket",
+      sender: "Uzu Ticket <alerts@uzuticket.com>",
+    });
 
     return sent || null;
   }
 
-  async sendPasswordChangeAlert(firstName: string, email: string) { }
+  async sendPasswordChangeAlert(firstName: string, email: string) {
+    //
+  }
 
-  async sendPasswordResetPin(firstName: string, email: string, resetPin: number) { }
+  async sendPasswordResetPin(
+    firstName: string,
+    email: string,
+    resetPin: number
+  ) {
+    //
+  }
 
-  async sendPurchaseConfirmation(eventName: string, payload: Partial<TicketPurchase>) {
-    const html = generatePurchaseReceiptEmail(eventName, payload);
-
+  async sendPurchaseConfirmation(
+    eventName: string,
+    payload: Partial<TicketPurchase>,
+    eventImage: string,
+    isTicket: boolean
+  ) {
+    const html = await generatePurchaseReceiptEmail(
+      eventName,
+      payload,
+      eventImage,
+      isTicket
+    );
     const sent = await this.mailgunService.sendMail({
       message: html,
-      recipients: ['kenovienadu@gmail.com'],
+      recipients: [payload?.userEmail],
       isHtml: true,
-      subject: 'Thanks for your Ticket Purchase - Uzu Tickets',
-      sender: 'Uzu Tickets <purchases@uzutickets.com>'
-    })
-
+      subject: isTicket
+        ? `${eventName} Ticket Details `
+        : `Thanks for your Ticket Purchase - Uzu Ticket`,
+      sender: "Uzu Ticket <purchases@uzuticket.com>",
+    });
     return sent || null;
+    // console.log('mail sent')
   }
 
   async sendTicketToUser(ticketDetails: TicketPurchased) {
-    // if (!ticketDetails.userEmail) {
-    //   return;
-    // }
+    if (!ticketDetails.userEmail) {
+      return;
+    }
 
     const html = await generateTicketEmail(ticketDetails);
 
     const sent = await this.mailgunService.sendMail({
       message: html,
-      recipients: ['kenovienadu@gmail.com'],
+      recipients: [ticketDetails?.userEmail],
       isHtml: true,
-      subject: `Ticket Details - Uzu Tickets - ${ticketDetails.id}`,
-      sender: 'Uzu Tickets <purchases@uzutickets.com>'
-    })
+      subject: `${ticketDetails?.event?.title} Ticket Details `,
+      sender: "Uzu Tickets <ticket@uzuticket.com>",
+    });
 
     return sent || null;
   }

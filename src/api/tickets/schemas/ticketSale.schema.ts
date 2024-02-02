@@ -1,9 +1,7 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 
-
 @Schema({ timestamps: true })
 export class TicketSale {
-
   @Prop()
   id: string;
 
@@ -14,18 +12,17 @@ export class TicketSale {
   buyerName: string;
 
   // @Prop()
-  // cartItems: 
+  // cartItems:
 
   @Prop()
   paymentConfirmed: boolean;
 
   @Prop()
   paymentRef: string;
-
 }
 
 interface TicketCartItem {
-  name: string
-  numberOfTickets: number
-  pricePerUnit: number
+  name: string;
+  numberOfTickets: number;
+  pricePerUnit: number;
 }

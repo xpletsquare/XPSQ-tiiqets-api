@@ -1,14 +1,16 @@
-
-
-import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
-
+import { IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { EventStatus } from "../schemas/event.schema";
 
 export class UpdateEventTicketDTO {
   @IsUUID()
   eventId: string;
 
+  @IsOptional()
+  @IsEnum(EventStatus)
+  status?: EventStatus
+
   @IsUUID()
-  id: string
+  id: string;
 
   @IsOptional()
   @IsString()
@@ -20,15 +22,15 @@ export class UpdateEventTicketDTO {
 
   @IsOptional()
   @IsNumber()
-  price?: number
+  price?: number;
 
   @IsOptional()
   @IsNumber()
-  availableTickets?: number;
+  nLimit?: number;
 
   @IsOptional()
   @IsNumber()
-  maxPossiblePurchases?: number
+  maxPurchases?: number;
 
   @IsOptional()
   @IsNumber()
