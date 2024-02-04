@@ -52,7 +52,7 @@ export class EmailService {
     const email = generateLoginAlertEmail(user);
     const sent = await this.mailgunService.sendMail({
       message: email,
-      recipients: ["jonesbgabriel@gmail.com"],
+      recipients: [user?.email],
       isHtml: true,
       subject: "Login Alert - Uzu Ticket",
       sender: "Uzu Ticket <alerts@uzuticket.com>",
