@@ -42,7 +42,7 @@ export class EmailService {
       recipients: [user.email],
       isHtml: true,
       subject: "Welcome to Uzu Ticket",
-      sender: "Uzu Ticket <welcome@uzuticket.com>",
+      sender: "Bina from Uzu Ticket <bina@uzuticket.com>",
     });
 
     return sent || null;

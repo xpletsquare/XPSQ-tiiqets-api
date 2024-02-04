@@ -3,6 +3,7 @@ import { UserDTO } from "src/interfaces";
 export const generateLoginAlertEmail = (user: Partial<UserDTO>) => {
   const time = new Date().toTimeString();
   const date = new Date().toDateString();
+  const year = new Date().getFullYear();
 
   return `
   <!DOCTYPE html>
@@ -21,7 +22,7 @@ export const generateLoginAlertEmail = (user: Partial<UserDTO>) => {
     
         <div class="message" style="margin: 1em 0;">
           <p style="margin-top: 1em">You recently logged in on ${date} ${time}.</p>
-          <p style="margin-top: 1em 0;">If this wasn't you, please send a message to alerts@xpsq.com</p>
+          <p style="margin-top: 1em 0;">If this wasn't you, please send a message to support@uzuticket.com</p>
         </div>
     
         <div class="footer" style="margin: 1em 0; margin-top: 50px; opacity: 0.5; font-size: 0.8em;">
@@ -31,10 +32,10 @@ export const generateLoginAlertEmail = (user: Partial<UserDTO>) => {
             } </span> (${
     user.email
   }). If you received this by mistake or have any questions, please reach out to us on
-            support@xpsq.com.
+            support@uzuticket.com.
           </div>
     
-          <div style="margin: 1em 0;">&copy; 2021 Uzu Tickets</div>
+          <div style="margin: 1em 0;">&copy; ${year} Uzu Ticket</div>
         </div>
       </main>
     </body>
