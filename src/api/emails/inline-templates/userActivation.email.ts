@@ -4,7 +4,9 @@ export const generateUserActivationEmail = (
   user: Partial<UserDTO>,
   activationPin: number
 ) => {
-  console.log({ activationPin });
+  // console.log({ activationPin });
+  const year = new Date().getFullYear();
+
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -38,7 +40,7 @@ export const generateUserActivationEmail = (
         </div>
   
         <div style="margin: 1em 0;">
-          &copy; 2021 Uzu Tickets
+          &copy; ${year} Uzu Ticket
         </div>
       </div>
     </main>
