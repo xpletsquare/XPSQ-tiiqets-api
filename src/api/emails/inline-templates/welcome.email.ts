@@ -1,6 +1,7 @@
 import { UserDTO } from "src/interfaces";
 
 export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
+  const year = new Date().getFullYear();
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -17,7 +18,7 @@ export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
         }</span> </div>
     
         <div class="message" style="margin: 1.4em 0;">
-          <div style="margin: 1em 0;">Welcome to XPSQ</div>
+          <div style="margin: 1em 0;">Welcome to Uzu Ticket</div>
         </div>
     
         <div class="footer" style="margin: 1.4em 0; margin-top: 100px; opacity: 0.5; font-size: 0.8em;">
@@ -26,11 +27,11 @@ export const generateWelcomeEmail = (user: Partial<UserDTO>) => {
               user.firstName + " " + user.lastName
             }  (${user.email}). 
             If you received this by mistake or have any questions, please reach out to us on
-            support@xpsq.com.
+            support@uzuticket.com.
           </div>
     
           <div style="margin: 1.4em 0;">
-            &copy; 2021 Uzu Tickets
+            &copy; ${year} Uzu Ticket
           </div>
         </div>
       </main>
